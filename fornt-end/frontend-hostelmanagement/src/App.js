@@ -2,6 +2,8 @@ import { matchPath, Route, Routes, useLocation, useNavigate } from "react-router
 import RouterUser from "./router/RouterUser";
 import { useEffect } from "react";
 import { useSessionStorage } from "./ultil/useSessionStorage";
+import RouterManager from "./router/RouterManager";
+import RouterOwner from "./router/RouterOwner";
 
 function App() {
   const navigate = useNavigate();
@@ -60,6 +62,8 @@ function App() {
   return (
     <Routes>
       <Route path="/*" element={<RouterUser />} />
+      <Route path="/manager/*" element={<RouterManager/>} />
+      <Route path="/owner/*" element={<RouterOwner/>} />
     </Routes>
   );
 }

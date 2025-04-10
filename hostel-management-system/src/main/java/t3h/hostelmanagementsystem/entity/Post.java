@@ -26,10 +26,6 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hostel_id")
-    private Hostel hostel;
-
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -38,9 +34,6 @@ public class Post {
 
     @Column(name = "image", columnDefinition = "LONGTEXT")
     private String image;
-
-    @Column(name = "status")
-    private Integer status = 1;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

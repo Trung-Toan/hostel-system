@@ -13,10 +13,9 @@ import {
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useGetPostList } from "../../controller/PostController";
+import { useSessionStorage } from "../../ultil/useSessionStorage";
 
-const ViewPort = ({ userLogin }) => {
-  const [viewPost, setViewPost] = useState([]);
-
+const ViewPort = () => {
   const { data, isLoading: loadingPost } = useGetPostList();
   const posts = data?.data?.result;
   const queryClient = useQueryClient();
@@ -29,26 +28,18 @@ const ViewPort = ({ userLogin }) => {
     onError: () => {},
   });
 
-  useEffect(() => {
-    if (!loadingPost) {
-      const filteredPosts =
-        userLogin?.role === 1
-          ? (posts || []).filter((p) => p.status !== 0)
-          : posts || [];
-      setViewPost(filteredPosts);
-    }
-  }, [loadingPost, posts, userLogin]);
+  const user = useSessionStorage("user");
 
   return (
     <Container>
       {/* Nút Thêm mới bài viết */}
       <div
         className={`text-center my-4 ${
-          userLogin?.role !== "manager" ? "d-none" : ""
+          user?.role !== "manager" ? "d-none" : ""
         }`}
       >
-        <Link to={"add_new_post"} className="btn btn-success">
-          Thêm bài mới
+        <Link to={"add-new-post"} className="btn btn-success">
+          New Post
         </Link>
       </div>
       {loadingPost ? (
@@ -58,8 +49,8 @@ const ViewPort = ({ userLogin }) => {
             <span className="visually-hidden">Loading...</span>
           </Spinner>
         </div>
-      ) : viewPost && viewPost.length > 0 ? (
-        viewPost?.map((p) => (
+      ) : posts && posts.length > 0 ? (
+        posts?.map((p) => (
           <Card
             key={p.id}
             className="my-4 border-0"
@@ -80,7 +71,7 @@ const ViewPort = ({ userLogin }) => {
                 </Col>
                 <Col
                   xs="auto"
-                  className={`${userLogin?.role !== 2 ? "d-none" : ""}`}
+                  className={`${user?.role !== 2 ? "d-none" : ""}`}
                 >
                   <Badge bg={p.status === 1 ? "success" : "secondary"}>
                     {p.status === 1 ? "Hoạt động" : "Không hoạt động"}
@@ -111,7 +102,7 @@ const ViewPort = ({ userLogin }) => {
               {/* Action Buttons */}
               <div
                 className={`d-flex ${
-                  userLogin?.role !== "manager" ? "d-none" : ""
+                  user?.role !== "manager" ? "d-none" : ""
                 } justify-content-between`}
               >
                 <Link className="btn btn-warning" to={`/manager/edit/${p.id}`}>

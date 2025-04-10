@@ -64,6 +64,7 @@ public enum ErrorCode {
     LOGIN_PASSWORD_SIZE(50505, "Password must be between 6 and 100 characters"),
 
     // PostDTO errors
+    POST_NOT_FOUND(50601, "Post is not found"),
     POST_USER_NULL(50602, "User cannot be null"),
     POST_HOSTEL_NULL(50603, "Hostel cannot be null"),
     POST_TITLE_BLANK(50604, "Title cannot be blank"),

@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Login from "../components/authentication/login/Login";
 import FindEmail from "../components/authentication/findAccountByEmail/FindEmail";
 import ForgetPassword from "../components/authentication/forgetPassword/ForgetPassword";
-import Home from "../components/user/Home";
+import Home from "../components/home/Home";
 import ViewPost from "../components/post/ViewPost";
 
 const RouterUser = () => {

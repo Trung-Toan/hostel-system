@@ -15,9 +15,7 @@ import java.time.LocalDateTime;
 public class PostDTO {
     private Long id;
 
-    private UserDTO user;
-
-    private HostelDTO hostel;
+    private Long userId;
 
     @NotBlank(message = "POST_TITLE_BLANK")
     @Size(max = 255, message = "POST_TITLE_SIZE")
@@ -28,9 +26,6 @@ public class PostDTO {
     private String content;
 
     private String image;
-
-    @NotNull(message = "POST_STATUS_NULL")
-    private Integer status;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -8,8 +8,8 @@ export const USER_API = {
 
 export const POST_API = {
   VIEW: `${API_URL}/post`,
-  CREATE: `${API_URL}/create_post`,
-  UPDATE: `${API_URL}/update_post`,
-  DELETE: `${API_URL}/delete_post`
+  CREATE: `${API_URL}/create-post`,
+  UPDATE: `${API_URL}/update-post`,
+  DELETE: `${API_URL}/delete-post`
 };
 

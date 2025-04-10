@@ -17,4 +17,13 @@ public interface UserMapper {
             @Mapping(target = "password", source = "password")
     })
     User toEntity(UserDTO userDTO);
+
+    default User toUser(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        User user = new User();
+        user.setId(userId);
+        return user;
+    }
 }
