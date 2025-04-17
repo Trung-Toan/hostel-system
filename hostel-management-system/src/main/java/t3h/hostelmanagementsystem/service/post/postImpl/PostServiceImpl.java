@@ -37,13 +37,20 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDTO updatePort(PostDTO postDTO) {
-        Post post = postRepository.findById(postDTO.getId()).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-        Post postUpdate = postRepository.save(post);
+        postRepository.findById(postDTO.getId()).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+        Post postUpdate = postRepository.save(postMapper.toPost(postDTO));
         return postMapper.toPostDTO(postUpdate);
     }
 
     @Override
     public void deletePort(Long id) {
-        postRepository.deleteById(id);
+        Post post = postRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+        postRepository.delete(post);
+    }
+
+    @Override
+    public PostDTO getPostById(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+        return postMapper.toPostDTO(post);
     }
 }

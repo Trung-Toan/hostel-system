@@ -48,6 +48,9 @@ public class Room {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "image", columnDefinition = "LONGTEXT")
+    private String image;
+
     @Column(name = "status")
     private Integer status = 1;
 

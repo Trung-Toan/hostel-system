@@ -1,4 +1,4 @@
-import { matchPath, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import RouterUser from "./router/RouterUser";
 import { useEffect } from "react";
 import { useSessionStorage } from "./ultil/useSessionStorage";
@@ -15,7 +15,7 @@ function App() {
   // Ánh xạ role với đường dẫn hợp lệ
   const roleRedirects = {
     customer: "/",
-    admin: "/admin",
+    owner: "/owner",
     manager: "/manager",
   };
 

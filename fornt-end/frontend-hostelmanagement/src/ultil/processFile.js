@@ -1,30 +1,30 @@
 import { useCallback } from "react";
 
 const useProcessFile = () => {
-  // Hàm chuyển đổi tệp sang Base64
-  const convertFilesToBase64 = useCallback((files) => {
-    return Promise.all(
-      files.map((file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result); // Trả về Base64
-          reader.onerror = (error) => reject(error); // Trả về lỗi nếu có
-          reader.readAsDataURL(file);
-        });
-      })
-    );
-  }, []);
+  const acceptedImageTypes = ["image/jpeg", "image/jpg", "image/png"];
 
-  // Hàm lọc tệp hợp lệ dựa trên định dạng được chấp nhận
-  const processFile = useCallback((files, typeAccept) => {
-    const validFiles = files.filter((file) => typeAccept.includes(file.type));
+  // Filter valid image files based on accepted types
+  const processFile = useCallback((files) => {
+    const validFiles = files.filter((file) => acceptedImageTypes.includes(file.type));
     if (validFiles.length !== files.length) {
-      alert("Một số tệp không hợp lệ hoặc không được hỗ trợ.");
+      alert("Some files are invalid or unsupported. Only JPEG, JPG, and PNG are allowed.");
     }
-    return validFiles; // Trả về danh sách tệp hợp lệ
+    return validFiles; // Return valid image files
   }, []);
 
-  return { convertFilesToBase64, processFile };
+  // Convert valid image files to Object URLs
+  const convertFilesToObjectURL = useCallback((files) => {
+    return files.map((file) => URL.createObjectURL(file)); // Return Object URLs
+  }, []);
+
+  // Main method to process and convert files
+  const handleFiles = useCallback((files) => {
+    const validFiles = processFile(files); // Filter valid files
+    const objectURLs = convertFilesToObjectURL(validFiles); // Convert to Object URLs
+    return { validFiles, objectURLs }; // Return both valid files and their Object URLs
+  }, [processFile, convertFilesToObjectURL]);
+
+  return { handleFiles, processFile, convertFilesToObjectURL };
 };
 
-export default useProcessFile;
+export default (useProcessFile);

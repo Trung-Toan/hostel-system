@@ -1,42 +1,23 @@
 package t3h.hostelmanagementsystem.service.hostel;
 
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import t3h.hostelmanagementsystem.dto.request.HostelDTO;
-import t3h.hostelmanagementsystem.entity.Hostel;
-import t3h.hostelmanagementsystem.mapper.HostelMapper;
-import t3h.hostelmanagementsystem.repository.HostelRepository;
 
 import java.util.List;
 
-@Service
-public class HostelService {
-    private final HostelRepository hostelRepository;
-    private final HostelMapper hostelMapper;
+public interface HostelService {
+    HostelDTO getHostelById(Long id);
 
-    public HostelService(HostelRepository hostelRepository, HostelMapper hostelMapper) {
-        this.hostelRepository = hostelRepository;
-        this.hostelMapper = hostelMapper;
-    }
+    List<HostelDTO> getAllHostel();
 
-    @Transactional(readOnly = true)
-    public Hostel getHostelWithRooms(Long id) {
-        return hostelRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Hostel not found"));
-    }
+    HostelDTO createHostel(HostelDTO hostelDTO);
 
-    @Transactional(readOnly = true)
-    public List<Hostel> getAllHostelsWithRooms() {
-        return hostelRepository.findAll();
-    }
+
+    HostelDTO updateHostel(HostelDTO hostelDTO);
 
     @Transactional
-    public HostelDTO createHostel(HostelDTO hostelDTO) {
-        if (hostelRepository.existsByName(hostelDTO.getName())) {
-            throw new IllegalArgumentException("Hostel name already exists");
-        }
-        Hostel hostel = hostelMapper.toHostel(hostelDTO);
-        hostel = hostelRepository.save(hostel);
-        return hostelMapper.toHostelDTO(hostel);
-    }
+    Page<HostelDTO> getAllHostelPaged(Pageable pageable, String search);
 }

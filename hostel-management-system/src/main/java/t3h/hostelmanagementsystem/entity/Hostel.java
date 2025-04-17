@@ -44,6 +44,9 @@ public class Hostel {
     @OneToMany(mappedBy = "hostel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Room> rooms;
 
+    @Column(name = "image", columnDefinition = "LONGTEXT")
+    private String image;
+
     @Column(name = "status")
     private Integer status = 1;
 

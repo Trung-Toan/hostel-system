@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
 import {
   Card,
   Row,
@@ -12,23 +11,49 @@ import {
   Badge,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useGetPostList } from "../../controller/PostController";
+import { deletePost, useGetPostList } from "../../controller/PostController";
 import { useSessionStorage } from "../../ultil/useSessionStorage";
+import Swal from "sweetalert2";
 
 const ViewPort = () => {
   const { data, isLoading: loadingPost } = useGetPostList();
   const posts = data?.data?.result;
   const queryClient = useQueryClient();
-  const { mutate, isLoading } = useMutation({
-    mutationFn: (id) => axios.delete(),
-    onSuccess: () => {
-
-      queryClient.invalidateQueries("post");
+  const { mutate } = useMutation({
+    mutationFn: (id) => deletePost(id),
+    onSuccess: (_, id) => {
+       // Sử dụng `id` từ tham số truyền vào mutate
+      queryClient.setQueryData(["posts"], (oldData) => {
+        if (!oldData) return oldData; // Kiểm tra nếu oldData là undefined
+        return {
+          ...oldData,
+          data: {
+            ...oldData.data,
+            result: oldData.data.result.filter((post) => post.id !== id),
+          },
+        };
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Post deleted successfully!",
+        timer: 3000,
+        showConfirmButton: false,
+      });
     },
-    onError: () => {},
+    onError: (error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.message || "An unexpected error occurred",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    },
   });
 
   const user = useSessionStorage("user");
+  const [deletingId, setDeletingId] = React.useState(null);
 
   return (
     <Container>
@@ -105,11 +130,24 @@ const ViewPort = () => {
                   user?.role !== "manager" ? "d-none" : ""
                 } justify-content-between`}
               >
-                <Link className="btn btn-warning" to={`/manager/edit/${p.id}`}>
+                <Link
+                  className="btn btn-warning" 
+                  to="/manager/edit-post"
+                  state={{post: p}}
+                >
                   Chỉnh sửa
                 </Link>
-                <Button variant="danger" size="sm" onClick={() => mutate(p.id)}>
-                  {isLoading ? "Đang xoá..." : "Xóa"}
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => {
+                    setDeletingId(p.id);
+                    mutate(p.id, {
+                      onSettled: () => setDeletingId(null),
+                    });
+                  }}
+                >
+                  {deletingId === p.id ? "Đang xoá..." : "Xóa"}
                 </Button>
               </div>
             </Card.Body>

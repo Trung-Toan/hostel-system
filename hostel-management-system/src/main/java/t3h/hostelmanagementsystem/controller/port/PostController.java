@@ -4,10 +4,14 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import t3h.hostelmanagementsystem.dto.request.PostDTO;
 import t3h.hostelmanagementsystem.dto.response.ApiResponse;
+import t3h.hostelmanagementsystem.exception.AppException;
+import t3h.hostelmanagementsystem.exception.ErrorCode;
 import t3h.hostelmanagementsystem.service.post.PostService;
 
+import java.util.Map;
+
 @RestController
-@RequestMapping("/")
+@RequestMapping("/manager")
 @CrossOrigin("*")
 public class PostController {
     private final PostService postService;
@@ -37,9 +41,22 @@ public class PostController {
         return apiResponse;
     }
 
-    @DeleteMapping("/delete=post")
-    public void deletePost(@RequestBody Long id) {
+    @DeleteMapping("/delete-post/{id}")
+    public void deletePost(@PathVariable Long id) {
+        if (id == null) {
+            throw new AppException(ErrorCode.POST_ID_NULL);
+        }
         postService.deletePort(id);
+    }
+
+    @GetMapping("/get-post-by-id/{id}")
+    public ApiResponse<PostDTO> getPostById(@PathVariable Long id) {
+        ApiResponse apiResponse = new ApiResponse();
+        if (id == null) {
+            throw new AppException(ErrorCode.POST_ID_NULL);
+        }
+        apiResponse.setResult(postService.getPostById(id));
+        return apiResponse;
     }
 
 }

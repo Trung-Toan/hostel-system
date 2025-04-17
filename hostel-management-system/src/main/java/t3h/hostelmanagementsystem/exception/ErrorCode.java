@@ -28,6 +28,7 @@ public enum ErrorCode {
     STATUS_NULL(50208, "Status cannot be null"),
 
     // HostelDTO errors
+    HOSTEL_NOT_FOUND(50301, "Hotel not found"),
     HOSTEL_NAME_BLANK(50302, "Name cannot be blank"),
     HOSTEL_NAME_SIZE(50303, "Name cannot exceed 255 characters"),
     HOSTEL_ADDRESS_BLANK(50304, "Address cannot be blank"),
@@ -35,6 +36,7 @@ public enum ErrorCode {
     HOSTEL_DESCRIPTION_SIZE(50306, "Description cannot exceed 1000 characters"),
     HOSTEL_OWNER_NULL(50307, "Owner cannot be null"),
     HOSTEL_STATUS_NULL(50308, "Status cannot be null"),
+    HOSTEL_EXISTED(50309, "Hostel name already exists"),
 
     // InvoiceDTO errors
     INVOICE_ROOM_NULL(50402, "Room cannot be null"),
@@ -64,6 +66,7 @@ public enum ErrorCode {
     LOGIN_PASSWORD_SIZE(50505, "Password must be between 6 and 100 characters"),
 
     // PostDTO errors
+    POST_ID_NULL(50600, "PostId cannot be null"),
     POST_NOT_FOUND(50601, "Post is not found"),
     POST_USER_NULL(50602, "User cannot be null"),
     POST_HOSTEL_NULL(50603, "Hostel cannot be null"),
@@ -93,6 +96,8 @@ public enum ErrorCode {
     ROOM_UTILITY_UTILITY_ID_NULL(50803, "Utility ID cannot be null"),
     ROOM_UTILITY_ROOM_NULL(50804, "Room cannot be null"),
     ROOM_UTILITY_UTILITY_NULL(50805, "Utility cannot be null"),
+    ROOM_EXISTED(50806, "Room name already existed"),
+    ROOM_NOT_FOUND(50807, "Room is not found"),
 
     // UserDTO errors
     USER_FULL_NAME_SIZE(50902, "Full name cannot exceed 255 characters"),

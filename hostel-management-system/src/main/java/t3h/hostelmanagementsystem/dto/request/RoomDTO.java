@@ -43,6 +43,8 @@ public class RoomDTO {
     @Size(max = 1000, message = "ROOM_DESCRIPTION_SIZE")
     private String description;
 
+    private String image;
+
     @NotNull(message = "ROOM_STATUS_NULL")
     private Integer status;
 

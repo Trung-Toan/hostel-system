@@ -22,6 +22,8 @@ public class CategoryDTO {
     @Size(max = 1000, message = "CATEGORY_DESCRIPTION_SIZE")
     private String description;
 
+    private String image;
+
     @NotNull(message = "CATEGORY_STATUS")
     private Integer status;
 

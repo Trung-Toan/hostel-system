@@ -1,5 +1,6 @@
 package t3h.hostelmanagementsystem.dto.request;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,11 +33,14 @@ public class HostelDTO {
 
     private UserDTO manager; // Manager có thể null
 
+    private String image;
+
     @NotNull(message = "HOSTEL_STATUS_NULL")
     private Integer status;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Valid
     private List<RoomDTO> rooms;
 }

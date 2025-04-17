@@ -31,6 +31,9 @@ public class Category {
     @Column(name = "status")
     private Integer status = 1; // Default value: 1 (active)
 
+    @Column(name = "image", columnDefinition = "LONGTEXT")
+    private String image;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
