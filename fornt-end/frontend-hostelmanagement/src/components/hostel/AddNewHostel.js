@@ -27,24 +27,7 @@ const AddNewHostel = () => {
     onSuccess: (newHostel) => {
       console.log(newHostel);
       
-      queryClient.setQueriesData(
-        [`hostels_${page.currentPage}_${page.size}_${page.search}_${page.sort}_${page.direction}`],
-        (oldData) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            data: {
-              ...oldData.data,
-              result: {
-                ...oldData.data.result,
-                content: [
-                  ...oldData.data.result.content,
-                  newHostel?.result,
-                ],
-              },
-            },
-          };
-        });
+      queryClient.invalidateQueries([`hostels_${page.currentPage}_${page.size}_${page.search}_${page.sort}_${page.direction}`]);
       Swal.fire({
         icon: "success",
         title: "Success",

@@ -28,9 +28,6 @@ public class Utility {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "price")
-    private Double price;
-
     @Column(name = "status")
     private Integer status = 1;
 

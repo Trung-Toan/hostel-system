@@ -4,6 +4,9 @@ import HomeMangement from "../components/home/HomeMangement";
 import AddNewHostel from "../components/hostel/AddNewHostel";
 import EditHostel from "../components/hostel/EditHostel";
 import ViewListHostel from "../components/hostel/ViewListHostel";
+import ViewListRoom from "../components/room/ViewListRoom";
+import ViewDetailRoom from "../components/room/ViewDetailRoom";
+import AddNewRoom from "../components/room/AddNewRoom";
 
 const RouterOwner = () => {
   return (
@@ -12,6 +15,9 @@ const RouterOwner = () => {
         <Route index element={<ViewListHostel />} />
         <Route path="create-hostel" element={<AddNewHostel />} />
         <Route path="edit-hostel" element={<EditHostel />} />
+        <Route path='room' element = {<ViewListRoom />} />
+        <Route path='room_detail' element = {<ViewDetailRoom/>} />
+        <Route path='create_room' element = {<AddNewRoom/>} />
       </Route>
     </Routes>
   );

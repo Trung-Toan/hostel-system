@@ -26,10 +26,6 @@ public class Room {
     @JoinColumn(name = "hostel_id", nullable = false)
     private Hostel hostel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
     @Column(name = "name", nullable = false)
     private String name;
 

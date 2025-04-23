@@ -25,3 +25,17 @@ export const HOSTEL_API = {
   UPDATE: `${API_URL}/owner/update-hostel`,
   GETHOSTEL: (id) => `${API_URL}/owner/get-hostel-by-id/${id}`,
 }
+
+export const ROOM_API = {
+  VIEW_ROOM_BY_HOSTEL_ID: (hostelId) => `${API_URL}/owner/view-room-by-hostel-id/${hostelId}`,
+  CREATE_ROOM: (hostelId) => `${API_URL}/owner/create-room/${hostelId}`,
+  UPDATE: (roomId) => `${API_URL}/owner/update-room/${roomId}`,
+}
+
+// api for owner and manager
+export const UTILITY_API = {
+  GET_ALL: `${API_URL}/manager/get-all-utility`,
+  GET_UTILITY_BY_STATUS: (status) => `${API_URL}/manager/get-utility-by-status/${status}`,
+  CREATE_UTILITY: `${API_URL}/manager/create-utility`,
+  UPDATE_UTILITY: (utilityId) => `${API_URL}/manager/update-utility/${utilityId}`,
+}

@@ -250,7 +250,7 @@ const ViewListHostel = () => {
                     >
                       Edit
                     </Link>
-                    <Button variant="primary" size="sm" as={Link} to={`room`}>
+                    <Button variant="primary" size="sm" as={Link} to={`room`} state={{hostel}}>
                       View Rooms
                     </Button>
                   </Card.Footer>

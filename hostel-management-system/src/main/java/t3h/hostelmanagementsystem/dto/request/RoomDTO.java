@@ -8,7 +8,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import t3h.hostelmanagementsystem.entity.Hostel;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,9 +19,6 @@ import java.time.LocalDateTime;
 public class RoomDTO {
 
     private Long id;
-
-    @NotNull(message = "ROOM_CATEGORY_NULL")
-    private CategoryDTO category;
 
     @NotBlank(message = "ROOM_NAME_BLANK")
     @Size(max = 255, message = "ROOM_NAME_SIZE")
@@ -48,6 +48,8 @@ public class RoomDTO {
     @NotNull(message = "ROOM_STATUS_NULL")
     private Integer status;
 
-    private LocalDateTime createdAt; // Không validate
-    private LocalDateTime updatedAt; // Không validate
+    private List<Long> utilities;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

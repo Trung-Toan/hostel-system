@@ -40,7 +40,4 @@ public class HostelDTO {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    @Valid
-    private List<RoomDTO> rooms;
 }

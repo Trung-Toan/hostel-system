@@ -120,6 +120,7 @@ public enum ErrorCode {
     USER_STATUS_NULL(50919, "Status cannot be null"),
 
     // UtilityDTO errors
+    UTILITY_NOT_FOUND(51001, "Utility not found"),
     UTILITY_NAME_BLANK(51002, "Name cannot be blank"),
     UTILITY_NAME_SIZE(51003, "Name cannot exceed 255 characters"),
     UTILITY_DESCRIPTION_SIZE(51004, "Description cannot exceed 1000 characters"),

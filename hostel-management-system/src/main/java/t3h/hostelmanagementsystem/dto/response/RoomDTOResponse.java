@@ -1,9 +1,10 @@
-package t3h.hostelmanagementsystem.dto.request;
+package t3h.hostelmanagementsystem.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,21 +13,17 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDTO {
+public class RoomDTOResponse {
     private Long id;
-
-    @NotBlank(message = "CATEGORY_NAME_BLANK")
-    @Size(max = 255, message = "CATEGORY_NAME_SIZE")
     private String name;
-
-    @Size(max = 1000, message = "CATEGORY_DESCRIPTION_SIZE")
+    private Double price;
+    private Integer area;
+    private Integer maxOccupants;
+    private Integer currentOccupants;
     private String description;
-
     private String image;
-
-    @NotNull(message = "CATEGORY_STATUS")
     private Integer status;
-
-    private LocalDateTime createdAt; // Không validate
-    private LocalDateTime updatedAt; // Không validate
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
+

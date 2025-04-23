@@ -23,10 +23,6 @@ public class UtilityDTO {
     @Size(max = 1000, message = "UTILITY_DESCRIPTION_SIZE")
     private String description;
 
-    @NotNull(message = "UTILITY_PRICE_NULL")
-    @Min(value = 0, message = "UTILITY_PRICE_NON_NEGATIVE")
-    private Double price;
-
     @NotNull(message = "UTILITY_STATUS_NULL")
     private Integer status;
 
