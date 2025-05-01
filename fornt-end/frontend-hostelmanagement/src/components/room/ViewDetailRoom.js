@@ -6,12 +6,11 @@ import {
   Button,
   Form,
   Spinner,
-  Alert,
   Card,
   Image,
 } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -24,18 +23,9 @@ const ViewDetailRoom = ({ utilities, statusMapping }) => {
   const queryClient = useQueryClient();
   const [img, setImg] = useState("");
 
-  const {
-    data: roomData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryFn: () => axios.get(`http://localhost:9999/room/${roomId}`),
-    queryKey: ["roomDetail", roomId],
-    staleTime: 10000,
-    cacheTime: 1000 * 60,
-    enabled: !!roomId,
-    retry: false,
-  });
+  const {state} = useLocation();
+  const hostel = state?.hostel;
+  const room = state?.room;
 
   const { mutate: updateRoom, isLoading: updatingRoom } = useMutation({
     mutationFn: (payload) =>
@@ -51,14 +41,14 @@ const ViewDetailRoom = ({ utilities, statusMapping }) => {
 
   const formik = useFormik({
     initialValues: {
-      name: roomData?.data?.name || "",
-      price: roomData?.data?.price || 0,
-      description: roomData?.data?.description || "",
-      status: roomData?.data?.status || 1,
-      images: roomData?.data?.images || [],
-      area: roomData?.data?.area || 0,
-      utilities: roomData?.data?.utilities || [],
-      currentOccupants: roomData?.data?.currentOccupants || 0,
+      name: room?.name || "",
+      price: room?.price || 0,
+      description: room?.description || "",
+      status: room?.status || 1,
+      image: room?.image?.split("|") || [],
+      area: room?.area || 0,
+      utilities: room?.utilities || [],
+      currentOccupants: room?.currentOccupants || 0,
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
@@ -73,7 +63,7 @@ const ViewDetailRoom = ({ utilities, statusMapping }) => {
     }),
     onSubmit: (values) => {
       const payload = {
-        ...roomData?.data,
+        ...room,
         ...values,
         status: Number(values.status),
       };
@@ -82,32 +72,20 @@ const ViewDetailRoom = ({ utilities, statusMapping }) => {
   });
 
   useEffect(() => {
-    if (formik?.values?.images.length > 0) {
-      setImg(formik.values.images[0]);
+    if (formik?.values?.image.length > 0) {
+      setImg(formik.values.image[0]);
     }
-  }, [formik.values.images]);
+  }, [formik.values.image]);
 
   const handleImageUpload = (event) => {
 
   };
 
   const handleImageRemove = (index) => {
-    const updatedImages = [...formik.values.images];
+    const updatedImages = [...formik.values.image];
     updatedImages.splice(index, 1);
     formik.setFieldValue("images", updatedImages);
   };
-
-  if (isLoading) {
-    return (
-      <div className="text-center mt-5">
-        <Spinner animation="border" role="status" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <Alert variant="danger">Lỗi: {error.message}</Alert>;
-  }
 
   return (
     <Container>
@@ -134,11 +112,11 @@ const ViewDetailRoom = ({ utilities, statusMapping }) => {
                       style={{ height: "300px", objectFit: "contain" }}
                     />
                     <div className="d-flex flex-wrap gap-3 justify-content-center border-top pt-3">
-                      {formik.values.images.map((i, index) => (
+                      {formik.values.image.map((i, index) => (
                         <div key={index} className="position-relative">
                           <Image
                             src={i}
-                            alt={`Hostel ${index}`}
+                            alt={`room ${index}`}
                             onClick={() => setImg(i)}
                             thumbnail
                             className="border"

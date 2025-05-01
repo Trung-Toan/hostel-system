@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { useGetAllUtilityByStatus } from "../../controller/UtilityController";
 import { createNewRoomAtHostelId } from "../../controller/RoomController";
 import useProcessFile from "../../ultil/processFile";
+import Swal from "sweetalert2";
 
 const AddNewRoom = () => {
   const navigate = useNavigate();
@@ -30,10 +31,26 @@ const AddNewRoom = () => {
   const { mutate, isLoading: creatingRoom } = useMutation({
     mutationFn: (payload) => createNewRoomAtHostelId(hostel?.id, payload),
     onSuccess: () => {
-      setTimeout(() => navigate(-1), 500);
-      queryClient.invalidateQueries(["rooms"]);
+      queryClient.refetchQueries([`rooms_hid${hostel?.id}`]);
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Add new room successfully!",
+        timer: 3000,
+        showConfirmButton: true,
+      }).then(() => {
+        navigate(-1);
+      });
     },
-    onError: () => {},
+    onError: (error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.message || "An error occurred!",
+        timer: 3000,
+        showConfirmButton: true,
+      });
+    },
   });
 
   const formik = useFormik({
@@ -70,6 +87,7 @@ const AddNewRoom = () => {
     onSubmit: (values) => {
       const payload = {
         ...values,
+        image: values.image.join("|"),
         status: Number(values.status),
         area: Number(values.area),
       };

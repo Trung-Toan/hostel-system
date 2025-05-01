@@ -23,7 +23,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
 import AddIcon from "@mui/icons-material/Add";
-import ViewListIcon from "@mui/icons-material/ViewList"; // Changed to ViewListIcon for clarity
+import ViewListIcon from "@mui/icons-material/ViewList";
 import {
   CardList,
   ClipboardPlus,
@@ -112,24 +112,10 @@ const HomeMangement = () => {
   const [invoiceOpen, setInvoiceOpen] = React.useState(false);
 
   const user = useSessionStorage("user");
-
   const role = user?.role;
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const toggleHostelMenu = () => {
-    setHostelOpen((prev) => !prev);
-  };
-
-  const toggleAccountMenu = () => {
-    setAccountOpen((prev) => !prev);
-  };
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -164,22 +150,17 @@ const HomeMangement = () => {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <Box>
-          <List>
-            {/* Các thành phần điều hướng */}
-          </List>
-        </Box>
         <List>
-          {/* Quản lý nhà trọ */}
+          {/* Hostel or Post Management */}
           <ListItem disablePadding>
-            <ListItemButton onClick={toggleHostelMenu}>
+            <ListItemButton onClick={() => setHostelOpen((prev) => !prev)}>
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>
               <ListItemText
-                primary={`${
-                  role === "owner" ? "Quản lý nhà trọ" : "Quản lý bài đăng"
-                }`}
+                primary={
+                  role === "owner" ? "Hostel Management" : "Post Management"
+                }
               />
               {hostelOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </ListItemButton>
@@ -192,42 +173,38 @@ const HomeMangement = () => {
                 to={`/${role}/`}
               >
                 <ListItemIcon>
-                  <ViewListIcon /> {/* Changed to ViewListIcon */}
+                  <ViewListIcon />
                 </ListItemIcon>
                 <ListItemText
-                  primary={`${
-                    role === "owner"
-                      ? "Danh sách nhà trọ"
-                      : "Danh sách bài đăng"
-                  }`}
+                  primary={
+                    role === "owner" ? "Hostel List" : "Post List"
+                  }
                 />
               </ListItemButton>
               <ListItemButton
                 sx={{ pl: 4 }}
                 component={NavLink}
-                to={`/${role}/${
-                  role === "owner" ? "create_hostel" : "add_new_post"
-                }`}
+                to={`/${role}/${role === "owner" ? "create_hostel" : "add_new_post"}`}
               >
                 <ListItemIcon>
                   <AddIcon />
                 </ListItemIcon>
                 <ListItemText
-                  primary={`${
-                    role === "owner" ? "Thêm nhà trọ" : "Thêm bài đăng"
-                  }`}
+                  primary={
+                    role === "owner" ? "Add Hostel" : "Add Post"
+                  }
                 />
               </ListItemButton>
             </List>
           </Collapse>
 
-          {/* Quản lý tài khoản */}
+          {/* Account Management */}
           <ListItem disablePadding>
-            <ListItemButton onClick={toggleAccountMenu}>
+            <ListItemButton onClick={() => setAccountOpen((prev) => !prev)}>
               <ListItemIcon>
                 <PeopleIcon />
               </ListItemIcon>
-              <ListItemText primary="Quản lý tài khoản" />
+              <ListItemText primary="Account Management" />
               {accountOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </ListItemButton>
           </ListItem>
@@ -241,7 +218,7 @@ const HomeMangement = () => {
                 <ListItemIcon>
                   <PersonLinesFill />
                 </ListItemIcon>
-                <ListItemText primary="Danh sách tài khoản" />
+                <ListItemText primary="Account List" />
               </ListItemButton>
               <ListItemButton
                 sx={{ pl: 4 }}
@@ -251,21 +228,20 @@ const HomeMangement = () => {
                 <ListItemIcon>
                   <PersonPlus />
                 </ListItemIcon>
-                <ListItemText primary="Tạo tài khoản" />
+                <ListItemText primary="Create Account" />
               </ListItemButton>
             </List>
           </Collapse>
-          {/* Quản lý tiện ích (utilities) */}
+
+          {/* Utility Management */}
           {(role === "manager" || role === "owner") && (
             <>
               <ListItem disablePadding>
-                <ListItemButton
-                  onClick={() => setUntilityOpen((prev) => !prev)}
-                >
+                <ListItemButton onClick={() => setUntilityOpen((prev) => !prev)}>
                   <ListItemIcon>
                     <Tools />
                   </ListItemIcon>
-                  <ListItemText primary="Quản lý tiện ích" />
+                  <ListItemText primary="Utility Management" />
                   {untilityOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </ListItemButton>
               </ListItem>
@@ -279,7 +255,7 @@ const HomeMangement = () => {
                     <ListItemIcon>
                       <CardList />
                     </ListItemIcon>
-                    <ListItemText primary="Danh sách tiện ích" />
+                    <ListItemText primary="Utility List" />
                   </ListItemButton>
                   <ListItemButton
                     sx={{ pl: 4 }}
@@ -289,14 +265,14 @@ const HomeMangement = () => {
                     <ListItemIcon>
                       <ClipboardPlus />
                     </ListItemIcon>
-                    <ListItemText primary="Thêm tiện ích" />
+                    <ListItemText primary="Add Utility" />
                   </ListItemButton>
                 </List>
               </Collapse>
             </>
           )}
 
-          {/* Quản lý hóa đơn (invoice) */}
+          {/* Invoice Management */}
           {role === "manager" && (
             <>
               <ListItem disablePadding>
@@ -304,7 +280,7 @@ const HomeMangement = () => {
                   <ListItemIcon>
                     <Receipt />
                   </ListItemIcon>
-                  <ListItemText primary="Quản lý hóa đơn" />
+                  <ListItemText primary="Invoice Management" />
                   {invoiceOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </ListItemButton>
               </ListItem>
@@ -318,7 +294,7 @@ const HomeMangement = () => {
                     <ListItemIcon>
                       <FileEarmarkText />
                     </ListItemIcon>
-                    <ListItemText primary="Danh sách hóa đơn" />
+                    <ListItemText primary="Invoice List" />
                   </ListItemButton>
                   <ListItemButton
                     sx={{ pl: 4 }}
@@ -328,7 +304,7 @@ const HomeMangement = () => {
                     <ListItemIcon>
                       <FilePlus />
                     </ListItemIcon>
-                    <ListItemText primary="Thêm hóa đơn" />
+                    <ListItemText primary="Add Invoice" />
                   </ListItemButton>
                 </List>
               </Collapse>
@@ -344,4 +320,5 @@ const HomeMangement = () => {
     </Box>
   );
 };
+
 export default memo(HomeMangement);

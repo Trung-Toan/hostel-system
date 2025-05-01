@@ -9,14 +9,20 @@ import ViewDetailRoom from "../components/room/ViewDetailRoom";
 import AddNewRoom from "../components/room/AddNewRoom";
 
 const RouterOwner = () => {
+  const statusMapping = {
+    1: { id: 1, color: "success", label: "Occupied" },
+    2: { id: 2, color: "info", label: "Deposited" },
+    3: { id: 3, color: "danger", label: "Banned" },
+    default: { id: 0, color: "secondary", label: "Vacant" },
+  };  
   return (
     <Routes>
       <Route path="/" element={<HomeMangement />}>
         <Route index element={<ViewListHostel />} />
         <Route path="create-hostel" element={<AddNewHostel />} />
         <Route path="edit-hostel" element={<EditHostel />} />
-        <Route path='room' element = {<ViewListRoom />} />
-        <Route path='room_detail' element = {<ViewDetailRoom/>} />
+        <Route path='room' element = {<ViewListRoom statusMapping = {statusMapping}/>} />
+        <Route path='room_detail' element = {<ViewDetailRoom statusMapping = {statusMapping}/>} />
         <Route path='create_room' element = {<AddNewRoom/>} />
       </Route>
     </Routes>

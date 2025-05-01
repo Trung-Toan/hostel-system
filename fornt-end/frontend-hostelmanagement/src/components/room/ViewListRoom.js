@@ -11,9 +11,8 @@ import {
 } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import Swal from "sweetalert2";
-import { useGetRoomByHostelId } from "../../controller/RoomController";
+import { updateRoom, useGetRoomByHostelId } from "../../controller/RoomController";
 
 const ViewListRoom = ({ statusMapping }) => {
   const { state } = useLocation();
@@ -29,17 +28,16 @@ const ViewListRoom = ({ statusMapping }) => {
   const roomList = data?.data?.result;
 
   const { mutate } = useMutation({
-    mutationFn: (payload) =>
-      axios.put(`http://localhost:9999/room/${payload.id}`, payload),
+    mutationFn: (payload) => updateRoom(payload?.id, payload),
     onSuccess: () => {
       Swal.fire({
         icon: "success",
         title: "Success",
-        text: "Change status room is successfully!",
+        text: "Room status changed successfully!",
         timer: 3000,
         showConfirmButton: true,
       });
-      queryClient.refetchQueries(["room"]);
+      queryClient.refetchQueries([`rooms_hid${hostel?.id}`]);
     },
     onError: (error) => {
       Swal.fire({
@@ -52,10 +50,11 @@ const ViewListRoom = ({ statusMapping }) => {
     },
   });
 
-  const changeStatus = (room, toId) => {
+  const changeStatus = (room, status) => {
     const updatedRoom = {
       ...room,
-      status: toId,
+      status: status,
+      hostel: hostel,
     };
     mutate(updatedRoom);
   };
@@ -76,23 +75,23 @@ const ViewListRoom = ({ statusMapping }) => {
         </div>
       ) : (
         <Container className="mt-5">
-          <div className=" d-flex justify-content-between mb-4">
+          <div className="d-flex justify-content-between mb-4">
             <Button
               variant="outline-info"
               onClick={() => navigate(-1)}
               className=""
             >
-              Trở về
+              Back
             </Button>
-            <Link to={"/owner/create_room/"} state={{hostel}} className="btn btn-success ">
-              Tạo phòng trọ mới
+            <Link to={"/owner/create_room/"} state={{ hostel }} className="btn btn-success">
+              Create New Room
             </Link>
           </div>
-          <h3 className="text-center mb-4">Danh sách phòng</h3>
+          <h3 className="text-center mb-4">Room List</h3>
           <Row className="g-4 d-flex justify-content-center">
             {roomList && roomList.length > 0 ? (
               roomList?.map((room) => (
-                <Col md={6} lg={3} key={room.id}>
+                <Col md={6} lg={3} key={room?.id}>
                   <Card className="shadow-sm position-relative">
                     <Dropdown className="position-absolute top-0 end-0 m-2">
                       <Dropdown.Toggle
@@ -112,9 +111,9 @@ const ViewListRoom = ({ statusMapping }) => {
                       <Dropdown.Menu>
                         <Dropdown.Item
                           as={Link}
-                          to={`/admin/room_detail/${room.id}`}
+                          to={`/owner/room_detail`}
                         >
-                          Chỉnh sửa
+                          Edit
                         </Dropdown.Item>
                         {Object.values(statusMapping)?.map((s) => {
                           return (
@@ -130,17 +129,16 @@ const ViewListRoom = ({ statusMapping }) => {
                     </Dropdown>
                     <Card.Img
                       variant="top"
-                      src={room?.images[0]}
+                      src={room?.image?.split("|")[0] || ""}
                       alt={room?.name}
                       style={{ height: "180px", objectFit: "cover" }}
                     />
                     <Card.Body>
-                      <Card.Title>{room.name}</Card.Title>
+                      <Card.Title>{room?.name}</Card.Title>
                       <Card.Text>
-                        <strong>Giá thuê:</strong> {formatCurrency(room.price)}{" "}
-                        <br />
-                        <strong>Diện tích:</strong> {room.area} m² <br />
-                        <strong>Trạng thái:</strong>{" "}
+                        <strong>Rental Price:</strong> {formatCurrency(room.price)} <br />
+                        <strong>Area:</strong> {room.area} m² <br />
+                        <strong>Status:</strong>{" "}
                         <Badge
                           bg={
                             statusMapping[room.status]?.color ||
@@ -157,8 +155,9 @@ const ViewListRoom = ({ statusMapping }) => {
                           size="sm"
                           as={Link}
                           to={`/owner/room_detail`}
+                          state={{ room, hostel }}
                         >
-                          Xem chi tiết
+                          View Details
                         </Button>
                       </div>
                     </Card.Body>
@@ -166,7 +165,7 @@ const ViewListRoom = ({ statusMapping }) => {
                 </Col>
               ))
             ) : (
-              <p className="text-center">Danh sách trống!</p>
+              <p className="text-center">List is empty!</p>
             )}
           </Row>
         </Container>
