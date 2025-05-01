@@ -50,6 +50,9 @@ public class RoomDTO {
 
     private List<Long> utilities;
 
+    @NotNull
+    private Hostel hostel;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

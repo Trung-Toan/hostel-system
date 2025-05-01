@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../../../fornt-end/frontend-hostelmanagement"
+		},
+		{
+			"path": "../../../../../../../../../../../Downloads/SDN-TOUR-booking"
+		},
+		{
+			"path": "../../../../../../../../../../project-react/hello_word"
+		},
+		{
+			"path": "../../../../../../.."
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic"
+	}
+}

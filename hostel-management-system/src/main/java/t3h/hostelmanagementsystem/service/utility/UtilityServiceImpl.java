@@ -2,12 +2,12 @@ package t3h.hostelmanagementsystem.service.utility;
 
 import org.springframework.stereotype.Service;
 import t3h.hostelmanagementsystem.dto.request.UtilityDTO;
+import t3h.hostelmanagementsystem.entity.Room;
 import t3h.hostelmanagementsystem.entity.Utility;
 import t3h.hostelmanagementsystem.exception.AppException;
 import t3h.hostelmanagementsystem.exception.ErrorCode;
 import t3h.hostelmanagementsystem.mapper.UtilityMapper;
 import t3h.hostelmanagementsystem.repository.UtilityRepository;
-
 import java.util.List;
 
 @Service

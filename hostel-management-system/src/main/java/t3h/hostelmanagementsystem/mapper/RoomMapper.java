@@ -8,10 +8,8 @@ import t3h.hostelmanagementsystem.entity.Room;
 
 @Mapper(componentModel = "spring")
 public interface RoomMapper {
-    @Mapping(target = "utilities", ignore = true)
     RoomDTO toRoomDTO(Room room);
 
-    @Mapping(target = "hostel", ignore = true)
     Room toRoomEntity(RoomDTO roomDTO);
 
     RoomDTOResponse toRoomDTOResponse(Room room);

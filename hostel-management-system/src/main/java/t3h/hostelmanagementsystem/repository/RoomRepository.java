@@ -7,4 +7,5 @@ import t3h.hostelmanagementsystem.entity.Room;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
     boolean existsByHostelIdAndName(Long hostelId, String name);
+    boolean existsByHostelIdAndNameAndIdNot(Long hostelId, String name, Long id);
 }
