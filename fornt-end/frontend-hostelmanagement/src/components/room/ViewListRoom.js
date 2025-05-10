@@ -12,7 +12,10 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
-import { updateRoom, useGetRoomByHostelId } from "../../controller/RoomController";
+import {
+  updateRoom,
+  useGetRoomByHostelId,
+} from "../../controller/RoomController";
 
 const ViewListRoom = ({ statusMapping }) => {
   const { state } = useLocation();
@@ -83,7 +86,11 @@ const ViewListRoom = ({ statusMapping }) => {
             >
               Back
             </Button>
-            <Link to={"/owner/create_room/"} state={{ hostel }} className="btn btn-success">
+            <Link
+              to={"/owner/create_room/"}
+              state={{ hostel }}
+              className="btn btn-success"
+            >
               Create New Room
             </Link>
           </div>
@@ -109,10 +116,7 @@ const ViewListRoom = ({ statusMapping }) => {
                         ...
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item
-                          as={Link}
-                          to={`/owner/room_detail`}
-                        >
+                        <Dropdown.Item as={Link} to={`/owner/room_detail`}>
                           Edit
                         </Dropdown.Item>
                         {Object.values(statusMapping)?.map((s) => {
@@ -131,13 +135,18 @@ const ViewListRoom = ({ statusMapping }) => {
                       variant="top"
                       src={room?.image?.split("|")[0] || ""}
                       alt={room?.name}
-                      style={{ height: "180px", objectFit: "cover" }}
+                      style={{ height: "180px", objectFit: "contain" }}
                     />
                     <Card.Body>
                       <Card.Title>{room?.name}</Card.Title>
                       <Card.Text>
-                        <strong>Rental Price:</strong> {formatCurrency(room.price)} <br />
+                        <strong>Rental Price:</strong>{" "}
+                        {formatCurrency(room.price)} <br />
                         <strong>Area:</strong> {room.area} m² <br />
+                        <strong>Max occupants:</strong> {room.maxOccupants}{" "}
+                        person <br />
+                        <strong>Current occupants:</strong>{" "}
+                        {room.currentOccupants} person <br />
                         <strong>Status:</strong>{" "}
                         <Badge
                           bg={

@@ -34,8 +34,13 @@ export const ROOM_API = {
 
 // api for owner and manager
 export const UTILITY_API = {
-  GET_ALL: `${API_URL}/manager/get-all-utility`,
+  GET_ALL: (search, sort, direction) => `${API_URL}/manager/get-all-utility?search=${search}&sort=${sort}&direction=${direction}`,
   GET_UTILITY_BY_STATUS: (status) => `${API_URL}/manager/get-utility-by-status/${status}`,
   CREATE_UTILITY: `${API_URL}/manager/create-utility`,
   UPDATE_UTILITY: (utilityId) => `${API_URL}/manager/update-utility/${utilityId}`,
+  GET_UTILITY_BY_ID: (utilityId) => `${API_URL}/manager/get-utility-by-id/${utilityId}`,
 }
+
+export const ROOM_UTILITY_API = {
+  GET_UTILITY_USED_BY_ROOM: (roomId) => `${API_URL}/owner/get-room-utility/used-by-room/${roomId}`,
+} 

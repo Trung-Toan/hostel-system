@@ -7,6 +7,8 @@ import ViewListHostel from "../components/hostel/ViewListHostel";
 import ViewListRoom from "../components/room/ViewListRoom";
 import ViewDetailRoom from "../components/room/ViewDetailRoom";
 import AddNewRoom from "../components/room/AddNewRoom";
+import ViewListUltility from "../components/utility/ViewListUltility";
+import CreateNewUltility from "../components/utility/CreateNewUltility";
 
 const RouterOwner = () => {
   const statusMapping = {
@@ -24,6 +26,9 @@ const RouterOwner = () => {
         <Route path='room' element = {<ViewListRoom statusMapping = {statusMapping}/>} />
         <Route path='room_detail' element = {<ViewDetailRoom statusMapping = {statusMapping}/>} />
         <Route path='create_room' element = {<AddNewRoom/>} />
+        <Route path='view_utilities' element = {<ViewListUltility/>} />
+        <Route path='create_utilities' element = {<CreateNewUltility/>} />
+        <Route path='view_utilities/edit_utility/:id' element={<CreateNewUltility/>} />
       </Route>
     </Routes>
   );

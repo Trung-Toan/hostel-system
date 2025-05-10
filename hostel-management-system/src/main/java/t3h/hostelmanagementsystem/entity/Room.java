@@ -36,10 +36,10 @@ public class Room {
     private Integer area;
 
     @Column(name = "max_occupants")
-    private Integer maxOccupants = 4;
+    private Integer maxOccupants;
 
     @Column(name = "current_occupants")
-    private Integer currentOccupants = 0;
+    private Integer currentOccupants;
 
     @Column(name = "description")
     private String description;
@@ -48,7 +48,7 @@ public class Room {
     private String image;
 
     @Column(name = "status")
-    private Integer status = 1;
+    private Integer status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

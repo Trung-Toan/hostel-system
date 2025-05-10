@@ -1,8 +1,8 @@
 package t3h.hostelmanagementsystem.service.utility;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import t3h.hostelmanagementsystem.dto.request.UtilityDTO;
-import t3h.hostelmanagementsystem.entity.Room;
 import t3h.hostelmanagementsystem.entity.Utility;
 import t3h.hostelmanagementsystem.exception.AppException;
 import t3h.hostelmanagementsystem.exception.ErrorCode;
@@ -22,10 +22,16 @@ public class UtilityServiceImpl implements UtilityService{
     }
 
     @Override
-    public List<UtilityDTO> getAllUtility() {
-        List<Utility> utilities = utilityRepository.findAll();
-        return utilities.stream().map(utilityMapper :: toUtilityDTO).toList();
+    public List<UtilityDTO> getAllUtility(String search, Sort sort) {
+        List<Utility> utilities;
+        if (search != null && !search.trim().isEmpty()) {
+            utilities = utilityRepository.filterUtility(search.trim(), sort);
+        } else {
+            utilities = utilityRepository.findAll(sort);
+        }
+        return utilities.stream().map(utilityMapper::toUtilityDTO).toList();
     }
+
 
     @Override
     public List<UtilityDTO> getUtilityByStatus(Integer status) {
@@ -47,6 +53,12 @@ public class UtilityServiceImpl implements UtilityService{
         Utility utility = utilityMapper.toUtility(utilityDTO);
         Utility addNew = utilityRepository.save(utility);
         return utilityMapper.toUtilityDTO(addNew);
+    }
+
+    @Override
+    public UtilityDTO getUtilityById(Long idUtility) {
+        Utility utility = findById(idUtility);
+        return utilityMapper.toUtilityDTO(utility);
     }
 
     private Utility findById (Long idUtility) {

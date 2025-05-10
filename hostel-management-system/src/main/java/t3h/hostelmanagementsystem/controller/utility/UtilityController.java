@@ -1,5 +1,6 @@
 package t3h.hostelmanagementsystem.controller.utility;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import t3h.hostelmanagementsystem.dto.request.UtilityDTO;
 import t3h.hostelmanagementsystem.dto.response.ApiResponse;
@@ -17,9 +18,17 @@ public class UtilityController {
     }
 
     @GetMapping("/get-all-utility")
-    public ApiResponse<List<UtilityDTO>> getAllUtility() {
+    public ApiResponse<List<UtilityDTO>> getAllUtility(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false, defaultValue = "name") String sort,
+            @RequestParam(required = false, defaultValue = "ASC") String direction
+    ) {
+        // Optional: Implement sorting and searching logic here if needed
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction.toUpperCase());
+        Sort sortBy = Sort.by(sortDirection, sort);
+        // Implement sorting and searching logic here if needed
         ApiResponse<List<UtilityDTO>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(utilityService.getAllUtility());
+        apiResponse.setResult(utilityService.getAllUtility(search, sortBy));
         return apiResponse;
     }
 
@@ -41,6 +50,13 @@ public class UtilityController {
     public ApiResponse<UtilityDTO> updateUtility(@PathVariable Long utilityId, @RequestBody UtilityDTO utilityDTO) {
         ApiResponse<UtilityDTO> apiResponse = new ApiResponse<>();
         apiResponse.setResult(utilityService.updateUtility(utilityId, utilityDTO));
+        return apiResponse;
+    }
+
+    @GetMapping("/get-utility-by-id/{utilityId}")
+    public ApiResponse<UtilityDTO> getUtilityById(@PathVariable Long utilityId) {
+        ApiResponse<UtilityDTO> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(utilityService.getUtilityById(utilityId));
         return apiResponse;
     }
 }

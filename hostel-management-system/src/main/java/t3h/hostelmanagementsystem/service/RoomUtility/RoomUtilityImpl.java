@@ -8,7 +8,6 @@ import t3h.hostelmanagementsystem.entity.Utility;
 import t3h.hostelmanagementsystem.exception.AppException;
 import t3h.hostelmanagementsystem.exception.ErrorCode;
 import t3h.hostelmanagementsystem.mapper.RoomUtilityMapper;
-import t3h.hostelmanagementsystem.repository.RoomRepository;
 import t3h.hostelmanagementsystem.repository.RoomUtilityRepository;
 import t3h.hostelmanagementsystem.repository.UtilityRepository;
 
@@ -59,8 +58,9 @@ public class RoomUtilityImpl implements RoomUtilityService{
     }
 
     @Override
-    public List<RoomUtilityDTO> getUtilityUsedByRoom(Long roomId) {
+    public List<Long> getUtilityUsedByRoom(Long roomId) {
         List<RoomUtility> roomUtilityList = roomUtilityRepository.findByRoomIdWithRoomAndUtility(roomId);
-        return roomUtilityList.stream().map(roomUtilityMapper :: toDto).toList();
+        List<Long> utilityUsed = roomUtilityList.stream().map(roomUtility -> roomUtility.getUtility().getId()).toList();
+        return utilityUsed;
     }
 }

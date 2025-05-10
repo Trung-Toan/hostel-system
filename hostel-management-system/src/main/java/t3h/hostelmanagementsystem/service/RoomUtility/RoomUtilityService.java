@@ -21,5 +21,5 @@ public interface RoomUtilityService {
      */
     void deleteRoomUtilityByRoomId(Long roomId);
 
-    List<RoomUtilityDTO> getUtilityUsedByRoom(Long roomId);
+    List<Long> getUtilityUsedByRoom(Long roomId);
 }

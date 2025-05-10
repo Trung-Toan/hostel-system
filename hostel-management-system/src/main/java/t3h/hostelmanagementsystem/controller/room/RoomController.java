@@ -37,4 +37,11 @@ public class RoomController {
         apiResponse.setResult(roomService.updateRoom(roomId, roomDTO));
         return apiResponse;
     }
+
+    @GetMapping("/get-room-by-id/{roomId}")
+    public ApiResponse<RoomDTO> getRoomById(@PathVariable Long roomId) {
+        ApiResponse<RoomDTO> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(roomService.getRoomById(roomId));
+        return apiResponse;
+    }
 }

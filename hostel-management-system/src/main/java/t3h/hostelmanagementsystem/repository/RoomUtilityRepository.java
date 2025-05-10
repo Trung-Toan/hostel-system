@@ -15,11 +15,8 @@ public interface RoomUtilityRepository extends JpaRepository<RoomUtility, Long> 
     List<RoomUtility> findByRoomId(Long roomId);
 
     @Query("SELECT ru FROM RoomUtility ru " +
-            "JOIN FETCH ru.room r " +
-            "JOIN FETCH r.hostel " +
             "JOIN FETCH ru.utility " +
             "WHERE ru.id.roomId = :roomId")
-    List<RoomUtility> findByRoomIdWithRoomAndUtility(@Param("roomId") Long roomId);
-
+    List<RoomUtility> findByRoomIdWithRoomAndUtility(Long roomId);
 
 }

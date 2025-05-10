@@ -7,8 +7,8 @@ import t3h.hostelmanagementsystem.service.RoomUtility.RoomUtilityService;
 
 import java.util.List;
 
-@RestController
 @CrossOrigin("*")
+@RestController
 @RequestMapping("/owner")
 public class RoomUtilityController {
     private final RoomUtilityService roomUtilityService;
@@ -16,9 +16,9 @@ public class RoomUtilityController {
         this.roomUtilityService = roomUtilityService;
     }
 
-    @GetMapping("/room-utility/get-utility-used/{roomId}")
-    public ApiResponse<List<RoomUtilityDTO>> getUtilityUsed(@PathVariable Long roomId) {
-        ApiResponse<List<RoomUtilityDTO>> apiResponse = new ApiResponse<>();
+    @GetMapping("/get-room-utility/used-by-room/{roomId}")
+    public ApiResponse<List<Long>> getUtilityUsedByRoom(@PathVariable Long roomId) {
+        ApiResponse<List<Long>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(roomUtilityService.getUtilityUsedByRoom(roomId));
         return apiResponse;
     }
