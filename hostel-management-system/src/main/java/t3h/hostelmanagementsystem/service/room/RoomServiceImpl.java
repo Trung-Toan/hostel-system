@@ -63,7 +63,7 @@ public class RoomServiceImpl implements RoomService {
     public RoomDTOResponse updateRoom(Long roomId, RoomDTO roomDTO) {
         List<Long> utilityIdList = roomDTO.getUtilities();
         findRoomById(roomId);
-        if (roomRepository.existsByHostelIdAndNameAndIdNot(roomDTO.getHostel().getId(), roomDTO.getName(), roomDTO.getId())) {
+        if (roomRepository.existsByHostelIdAndNameAndIdNot(roomDTO.getHostelId(), roomDTO.getName(), roomDTO.getId())) {
             throw new AppException(ErrorCode.ROOM_EXISTED);
         }
         Room room = roomMapper.toRoomEntity(roomDTO);

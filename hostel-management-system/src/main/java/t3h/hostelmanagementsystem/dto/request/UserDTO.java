@@ -63,6 +63,10 @@ public class UserDTO {
     @NotNull(message = "USER_STATUS_NULL")
     private Integer status;
 
+    private Long hostelId;
+
+    private Long roomId;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

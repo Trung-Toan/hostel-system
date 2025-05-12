@@ -7,14 +7,20 @@ import org.springframework.transaction.annotation.Transactional;
 import t3h.hostelmanagementsystem.dto.request.ForgotPasswordRequest;
 import t3h.hostelmanagementsystem.dto.request.LoginRequestDTO;
 import t3h.hostelmanagementsystem.dto.request.UserDTO;
+import t3h.hostelmanagementsystem.entity.CustomerRoom;
+import t3h.hostelmanagementsystem.entity.Hostel;
 import t3h.hostelmanagementsystem.entity.User;
 import t3h.hostelmanagementsystem.exception.AppException;
 import t3h.hostelmanagementsystem.exception.ErrorCode;
 import t3h.hostelmanagementsystem.mapper.UserMapper;
+import t3h.hostelmanagementsystem.repository.CustomerRoomRepository;
+import t3h.hostelmanagementsystem.repository.HostelRepository;
+import t3h.hostelmanagementsystem.repository.RoomRepository;
 import t3h.hostelmanagementsystem.repository.UserRepository;
 import t3h.hostelmanagementsystem.service.user.UserService;
 
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,10 +28,20 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final HostelRepository hostelRepository;
+    private final RoomRepository roomRepository;
+    private final CustomerRoomRepository roomCustomerRoomRepository;
+    private final CustomerRoomRepository customerRoomRepository;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,
+                           HostelRepository hostelRepository, RoomRepository roomRepository,
+                           CustomerRoomRepository roomCustomerRoomRepository, CustomerRoomRepository customerRoomRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.hostelRepository = hostelRepository;
+        this.roomRepository = roomRepository;
+        this.roomCustomerRoomRepository = roomCustomerRoomRepository;
+        this.customerRoomRepository = customerRoomRepository;
     }
 
     @Override
@@ -48,12 +64,6 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
 
-        // Kiểm tra xem email đã tồn tại chưa
-        Optional<User> existingUserByEmail = userRepository.findByEmail(userDTO.getEmail());
-        if (existingUserByEmail.isPresent()) {
-            throw new AppException(ErrorCode.USER_EXISTED);
-        }
-
         // Chuyển từ UserDTO sang User entity
         User user = userMapper.toEntity(userDTO);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -61,6 +71,23 @@ public class UserServiceImpl implements UserService {
 
         // Lưu user vào database
         User savedUser = userRepository.save(user);
+
+        if (userDTO.getRole().equalsIgnoreCase("manager")) {
+            Hostel hostel = hostelRepository.findById(userDTO.getHostelId()).orElseThrow(() -> new AppException(ErrorCode.HOSTEL_NOT_FOUND));
+            hostel.setManager(savedUser);
+            hostelRepository.save(hostel);
+        } else {
+            Long customerId = savedUser.getId();
+            Long roomId = userDTO.getRoomId();
+            LocalDate startDate = LocalDate.now();
+            CustomerRoom.CustomerRoomId customerRoomId = new CustomerRoom.CustomerRoomId(customerId, roomId);
+
+            CustomerRoom customerRoom = new CustomerRoom();
+            customerRoom.setId(customerRoomId);
+            customerRoom.setStartDate(startDate);
+
+            customerRoomRepository.save(customerRoom);
+        }
 
         // Chuyển từ User entity đã lưu sang UserDTO và trả về
         return userMapper.toDto(savedUser);

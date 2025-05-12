@@ -1,5 +1,6 @@
 package t3h.hostelmanagementsystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class Room {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hostel_id", nullable = false)
+    @JsonIgnore
     private Hostel hostel;
 
     @Column(name = "name", nullable = false)

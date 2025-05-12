@@ -41,9 +41,6 @@ public class CustomerRoom {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "status")
-    private Byte status = 1;
-
     @Embeddable // khi một entity có khóa chính tổng hợp, bạn cần một cách để biểu diễn khóa chính đó dưới dạng một đối tượng duy nhất
     public static class CustomerRoomId implements java.io.Serializable {
         @Column(name = "customer_id")

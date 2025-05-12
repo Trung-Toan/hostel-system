@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import t3h.hostelmanagementsystem.dto.request.HostelDTO;
+import t3h.hostelmanagementsystem.entity.Hostel;
 
 import java.util.List;
 

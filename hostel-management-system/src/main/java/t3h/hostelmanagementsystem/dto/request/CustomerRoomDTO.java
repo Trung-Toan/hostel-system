@@ -19,19 +19,10 @@ public class CustomerRoomDTO {
     @NotNull(message = "ROOM_ID_NULL")
     private Long roomId;
 
-    @NotNull(message = "CUSTOMER_NULL")
-    private UserDTO customer;
-
-    @NotNull(message = "ROOM_NULL")
-    private RoomDTO room;
-
     @NotNull(message = "START_DATE_BLANK")
     @PastOrPresent(message = "START_DATE_PAST_OR_PRESENT")
     private LocalDate startDate;
 
     @FutureOrPresent(message = "END_DATE_FUTURE_OR_PRESENT")
     private LocalDate endDate;
-
-    @NotNull(message = "STATUS_NULL")
-    private Integer status;
 }
