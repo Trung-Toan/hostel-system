@@ -31,13 +31,6 @@ public class Authentication {
         return apiResponse;
     }
 
-    @PostMapping("/register")
-    public ApiResponse<UserDTO> register(@Valid @RequestBody UserDTO userDTO) {
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setResult(userService.createUser(userDTO));
-        return apiResponse;
-    }
-
     @PostMapping("/find_email")
     public ApiResponse<UserDTO> findUserByEmail(@RequestBody Map<String, String> request) {
         ApiResponse apiResponse = new ApiResponse();

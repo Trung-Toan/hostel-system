@@ -44,3 +44,11 @@ export const UTILITY_API = {
 export const ROOM_UTILITY_API = {
   GET_UTILITY_USED_BY_ROOM: (roomId) => `${API_URL}/owner/get-room-utility/used-by-room/${roomId}`,
 } 
+
+export const ACCOUNT_API = {
+  GET_ALL_USER_EXCEPT_ROLE: (page, size, search, sort, direction, role) => `${API_URL}/owner/get-all-user/except-role/${role}?page=${page}&size=${size}&search=${search}&sort=${sort}&direction=${direction}`,
+  GET_ALL_USER_BY_ROLE: (page, size, search, sort, direction, role) => `${API_URL}/owner/get-all-user/by-role/${role}?page=${page}&size=${size}&search=${search}&sort=${sort}&direction=${direction}`,
+  CREATE: `${API_URL}/owner/create-account`,
+  UPDATE: (accountId) => `${API_URL}/owner/update-user/${accountId}`,
+  GET_ACCOUNT_BY_ID: (userId) => `${API_URL}/owner/get-user-by-id/${userId}`,
+}

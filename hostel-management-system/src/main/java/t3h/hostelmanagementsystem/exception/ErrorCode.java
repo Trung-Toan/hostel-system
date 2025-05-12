@@ -7,6 +7,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(40002, "User not found"),
     FORGOT_PASSWORD_USERID_NOT_NULL(40003, "Forgot Password User Id Not Null"),
     PASSWORD_NOT_MATCH_REPASSWORD(40004, "Password not math RePassword"),
+    USER_PASSWORD_WEAK(40005, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character"),
 
     // valid error
     INVALID_KEY(50000, "Invalid key"),

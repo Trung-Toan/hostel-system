@@ -3,6 +3,7 @@ package t3h.hostelmanagementsystem.service.user.userImp;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import t3h.hostelmanagementsystem.dto.request.ForgotPasswordRequest;
 import t3h.hostelmanagementsystem.dto.request.LoginRequestDTO;
 import t3h.hostelmanagementsystem.dto.request.UserDTO;
@@ -14,6 +15,7 @@ import t3h.hostelmanagementsystem.repository.UserRepository;
 import t3h.hostelmanagementsystem.service.user.UserService;
 
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,6 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDTO createUser(UserDTO userDTO) {
         // Kiểm tra xem username đã tồn tại chưa
         Optional<User> existingUserByUsername = userRepository.findByUsername(userDTO.getUsername());
@@ -70,6 +73,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDTO forgotPassword(ForgotPasswordRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -83,5 +87,40 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.save(user);
 
         return userMapper.toDto(updatedUser);
+    }
+
+    @Override
+    public List<UserDTO> getAllUserExceptRole(String role) {
+        List<User> userList = userRepository.findAllUserExceptRole(role);
+        return userList.stream().map(userMapper :: toDto).toList();
+    }
+
+    @Override
+    public List<UserDTO> getAllUserByRole(String role) {
+        List<User> userList = userRepository.findAllUserByRole(role);
+        return userList.stream().map(userMapper :: toDto).toList();
+    }
+
+    @Override
+    @Transactional
+    public UserDTO updateUser(Long userId, UserDTO userDTO) {
+        findById(userId);
+        User user = userMapper.toEntity(userDTO);
+        user.setId(userId);
+        if (userRepository.existsByUsernameAndIdNot(user.getUsername(), userId)) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+        User userUpdate = userRepository.save(user);
+        return userMapper.toDto(userUpdate);
+    }
+
+    @Override
+    public UserDTO getUserById(Long userId) {
+        User user = findById(userId);
+        return userMapper.toDto(user);
+    }
+
+    private User findById (Long idUser) {
+        return userRepository.findById(idUser).orElseThrow(() ->new AppException(ErrorCode.USER_NOT_FOUND));
     }
 }

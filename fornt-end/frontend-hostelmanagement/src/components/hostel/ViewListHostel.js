@@ -33,7 +33,7 @@ const ViewListHostel = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useGetHostelList(...page);
+  const { data, isLoading } = useGetHostelList(page.currentPage, page.size, page.search, page.sort, page.direction);
 
   const hostel = data?.data?.result?.content || [];
   const totalPages = data?.data?.result?.page?.totalPages || 1;

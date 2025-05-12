@@ -56,6 +56,7 @@ public class UtilityController {
     @GetMapping("/get-utility-by-id/{utilityId}")
     public ApiResponse<UtilityDTO> getUtilityById(@PathVariable Long utilityId) {
         ApiResponse<UtilityDTO> apiResponse = new ApiResponse<>();
+        // Call the service to get the utility by its ID
         apiResponse.setResult(utilityService.getUtilityById(utilityId));
         return apiResponse;
     }

@@ -35,6 +35,10 @@ public class UserDTO {
 
     @NotBlank(message = "USER_PASSWORD_BLANK")
     @Size(min = 6, message = "USER_PASSWORD_SIZE")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{6,}$",
+            message = "USER_PASSWORD_WEAK"
+    )
     private String password;
 
     @NotNull(message = "USER_DOB_NULL")
