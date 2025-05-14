@@ -24,6 +24,7 @@ export const HOSTEL_API = {
   CREATE: `${API_URL}/owner/create-hostel`,
   UPDATE: `${API_URL}/owner/update-hostel`,
   GETHOSTEL: (id) => `${API_URL}/owner/get-hostel-by-id/${id}`,
+  GETALL: `${API_URL}/owner/get-all-hostel`,
 }
 
 export const ROOM_API = {

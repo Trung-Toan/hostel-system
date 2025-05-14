@@ -104,7 +104,7 @@ const ViewDetailRoom = ({ statusMapping }) => {
       const payload = {
         ...room,
         ...values,
-        hostel: hostel,
+        hostelId: hostel?.id,
         image: values.image.join("|"),
         status: Number(values.status),
       };

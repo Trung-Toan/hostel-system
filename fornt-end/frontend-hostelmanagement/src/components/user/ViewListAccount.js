@@ -1,145 +1,206 @@
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback, useState } from "react";
 import {
-  Form,
-  Button,
-  InputGroup,
+  Table,
   Container,
+  Spinner,
+  Form,
+  InputGroup,
+  Button,
+  Image,
   Row,
   Col,
-  Spinner,
-  Alert,
 } from "react-bootstrap";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
-import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import ViewRoomByHostel from "./ViewRoomByHostel";
+import { Link } from "react-router-dom";
 import { useSessionStorage } from "../../ultil/useSessionStorage";
+import { useGetAllUserByRole } from "../../controller/UserController";
+import { useGetAllHostel } from "../../controller/HostelController";
 
-const CreateAccount = () => {
-  const queryClient = useQueryClient();
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const navigate = useNavigate();
+const ViewListAccount = () => {
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [isLoadRoom, setIsLoadRoom] = useState();
-  const [errorRoom, setErrorRoom] = useState(null);
-
-  const userLogin = useSessionStorage("user");
-
-  console.log(userLogin);
-  
+  const [selectedHostel, setSelectedHostel] = useState("");
+  const [filteredAccounts, setFilteredAccounts] = useState([]);
 
   const [page, setPage] = useState({
-      currentPage: 0,
-      size: 12,
-      search: "",
-      sort: "name",
-      direction: "asc",
-      role: "owner"
-    });
+    currentPage: 0,
+    size: 12,
+    search: "",
+    sort: "name",
+    direction: "asc",
+  });
 
   const handleChangeLoadingRoom = useCallback((stateLoading) => {
     setIsLoadRoom(stateLoading);
   }, []);
 
-  const handleChangeErrorRoom = useCallback((stateError) => {
-    setErrorRoom(stateError);
-  }, []);
+  const userLogin = useSessionStorage("user");
 
-  const {
-    data: hostel,
-    isLoading: loadingHostel,
-    error: errorHostel,
-  } = useQuery({
-    queryFn: () => [],
-    queryKey: ["hostel"],
-    staleTime: 10000,
-    cacheTime: 1000 * 60,
-  });
+  const targetRole =
+    userLogin.role === "owner"
+      ? "manager"
+      : userLogin.role === "manager"
+      ? "customer"
+      : null;
 
-  // Mutation to send data to the server
-  const { mutate: createAccount, isLoading: creatingAccount } = useMutation({
-    mutationFn: (payload) => [],
-    onSuccess: () => {
-      alert("Account created successfully!");
-      queryClient.invalidateQueries(["accounts"]);
-      setTimeout(() => {
-        navigate("/admin/view_account");
-      }, 1000);
-    },
-    onError: () => {
-      alert("An error occurred while creating the account!");
-    },
-  });
+  const { data:accountData, isLoading:loadingAccount} = useGetAllUserByRole(page?.currentPage, page.size, page.search, page.sort, page.direction, targetRole);
+  const {data:hostelData, isLoading:loadingHostel} = useGetAllHostel();
 
-  // Formik and Yup for validation
-  const formik = useFormik({
-    initialValues: {
-      fullName: "",
-      username: "",
-      email: "",
-      phoneNumber: "",
-      password: "",
-      dob: "",
-      address: "",
-      personalAuth: "",
-      roomID: "",
-    },
-    validationSchema: Yup.object({
-      fullName: Yup.string().trim().required("Full name cannot be empty."),
-      username: Yup.string()
-        .trim()
-        .required("Username cannot be empty."),
-      email: Yup.string()
-        .email("Invalid email.")
-        .required("Email cannot be empty."),
-      phoneNumber: Yup.string()
-        .matches(/^\d+$/, "Phone number must contain only digits.")
-        .required("Phone number cannot be empty."),
-      password: Yup.string()
-        .min(6, "Password must be at least 6 characters.")
-        .required("Password cannot be empty."),
-      dob: Yup.date()
-        .required("Date of birth cannot be empty.")
-        .test("dob-range", "Age must be between 16 and 100.", function (value) {
-          if (!value) return false;
-          const today = new Date();
-          const birthDate = new Date(value);
-          const age = today.getFullYear() - birthDate.getFullYear();
-          const monthDifference = today.getMonth() - birthDate.getMonth();
+  const accountList = accountData?.data?.result || []; 
+  const hostelList = hostelData?.data?.result || []; 
 
-          if (
-            monthDifference < 0 ||
-            (monthDifference === 0 && today.getDate() < birthDate.getDate())
-          ) {
-            return age - 1 >= 16 && age - 1 <= 100;
-          }
+  console.log(hostelList);
+  
 
-          return age >= 16 && age <= 100;
-        }),
-      address: Yup.string().trim().required("Address cannot be empty."),
-      personalAuth: Yup.string()
-        .trim()
-        .required("Personal identification code cannot be empty.")
-        .matches(/^[0-9a-zA-Z]+$/, "Personal ID must contain only letters and numbers."),
-    }),
-    onSubmit: (values) => {
-      const payload = {
-        ...values,
-        role: userLogin.role === 1 ? 2 : 0,
-        status: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      createAccount(payload);
-    },
-  });
-
-  const handleChangeRoom = (acc, accountId, newRoomId) => {
-    formik.setFieldValue("roomID", newRoomId);
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    setSelectedHostel("");
+    const results = accounts?.filter(
+      (account) =>
+        account.fullName.toLowerCase().includes(term.trim()) ||
+        account.id.toString().includes(term.trim()) ||
+        account.email.toLowerCase().includes(term.trim()) ||
+        account.phoneNumber.includes(term.trim())
+      // ||
+      // hostel?.data?.some(
+      //   (h) =>
+      //     h.id === account.hostelID &&
+      //     h.name.toLowerCase().includes(term.trim())
+      // )
+    );
+    // setFilteredAccounts(results);
   };
 
-  if (loadingHostel || isLoadRoom) {
+  // Sort
+  const handleSort = (field) => {
+    const newSortOrder =
+      sortField === field && sortOrder === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortOrder(newSortOrder);
+
+    const sorted = [].sort((a, b) => {
+      let aValue, bValue;
+
+      if (field === "hostel") {
+        // const hostelA = hostel?.data?.find((h) => h.id === a.hostelID);
+        // const hostelB = hostel?.data?.find((h) => h.id === b.hostelID);
+        // aValue = hostelA ? hostelA.name.toLowerCase() : "";
+        // bValue = hostelB ? hostelB.name.toLowerCase() : "";
+      } else {
+        aValue = a[field] ? a[field].toString().toLowerCase() : "";
+        bValue = b[field] ? b[field].toString().toLowerCase() : "";
+      }
+
+      if (newSortOrder === "asc") {
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+      } else {
+        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+      }
+    });
+    // setFilteredAccounts(sorted);
+  };
+
+  const handleFilterByHostel = (e) => {
+    const hostelId = e.target.value;
+    setSelectedHostel(hostelId);
+    setSearchTerm("");
+
+    if (hostelId === "") {
+      // setFilteredAccounts(accounts);
+    } else {
+      const filtered = accounts.filter(
+        (account) => account.hostelID.toString() === hostelId
+      );
+      // setFilteredAccounts(filtered);
+    }
+  };
+
+  const handleUpdateStatus = async (accountId, currentStatus) => {
+    const newStatus = currentStatus === 1 ? 0 : 1;
+    try {
+      // Find the account in the current list
+      const accountToUpdate = accounts.find(
+        (account) => account.id === accountId
+      );
+
+      // Send PUT request to update status, keeping all other fields unchanged
+      // await axios.put(`http://localhost:9999/user/${accountId}`, {
+      //   ...accountToUpdate, // Retain all existing fields
+      //   status: newStatus, // Only change status
+      // });
+
+      // Update status in state without changing other fields
+      const updatedAccounts = accounts.map((account) =>
+        account.id === accountId ? { ...account, status: newStatus } : account
+      );
+
+      // Update state with the modified account list
+      setAccounts(updatedAccounts);
+      // setFilteredAccounts(updatedAccounts);
+    } catch (error) {}
+  };
+
+  const handleChangeHostel = (account, accountId, newHostelId) => {
+    // axios
+    //   .put(`http://localhost:9999/user/${accountId}`, {
+    //     ...account,
+    //     hostelID: newHostelId,
+    //     updatedAt: getCurrentDateTime(),
+    //   })
+    //   .then(() => {
+    //     const updatedAccounts = accounts.map((account) =>
+    //       account.id === accountId
+    //         ? { ...account, hostelID: newHostelId }
+    //         : account
+    //     );
+    //     setUpdateMessage({
+    //       type: "success",
+    //       text: "Hostel changed successfully!",
+    //     });
+    //     setAccounts(updatedAccounts);
+    //     setFilteredAccounts(updatedAccounts);
+    //   })
+    //   .catch(() => {
+    //     setUpdateMessage({
+    //       type: "error",
+    //       text: "An error occurred while updating hostel!",
+    //     });
+    //   });
+  };
+
+  const handleChangeRoom = (acc, accountId, newRoomId) => {
+    // axios
+    //   .put(`http://localhost:9999/user/${accountId}`, {
+    //     ...acc,
+    //     roomID: newRoomId,
+    //     updatedAt: getCurrentDateTime(),
+    //   })
+    //   .then(() => {
+    //     const updatedAccounts = accounts.map((account) =>
+    //       account.id === accountId ? { ...account, roomID: newRoomId } : account
+    //     );
+    //     setUpdateMessage({
+    //       type: "success",
+    //       text: "Room changed successfully!",
+    //     });
+    //     setAccounts(updatedAccounts);
+    //     setFilteredAccounts(updatedAccounts);
+    //   })
+    //   .catch(() => {
+    //     setUpdateMessage({
+    //       type: "error",
+    //       text: "An error occurred while updating room!",
+    //     });
+    //   });
+  };
+
+  if (loadingAccount || isLoadRoom) {
     return (
       <Container className="mt-5 text-center">
         <Spinner animation="border" />
@@ -148,223 +209,211 @@ const CreateAccount = () => {
     );
   }
 
-  if (errorHostel || errorRoom) {
-    return (
-      <Container className="mt-5">
-        <Alert variant="danger">
-          The system is experiencing an issue. Please try again later!
-        </Alert>
-      </Container>
-    );
-  }
-
   return (
-    <Container className="mt-4">
+    <Container className="mt-5 p-1">
       <h2 className="text-center mb-4">
-        Create Account {userLogin.role === 1 ? "Manager" : "Customer"}
+        Account List {userLogin.role === 1 ? "User (Manager)" : "Customer"}
       </h2>
-      <Form onSubmit={formik.handleSubmit}>
-        {/* Full Name */}
-        <Row className="mb-3">
-          <Col>
-            <Form.Group controlId="username">
-              <Form.Label>Username</Form.Label>
+      <Row className="mb-4 justify-content-between">
+        <Col md={4}>
+          <Form.Group controlId="search">
+            <Form.Label className="fw-bold">Search</Form.Label>
+            <InputGroup className="mb-3">
               <Form.Control
                 type="text"
-                name="username"
-                placeholder="Enter username"
-                value={formik.values.username}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                isInvalid={formik.touched.username && !!formik.errors.username}
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={handleSearch}
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.username}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="fullName">
-              <Form.Label>Full Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="fullName"
-                placeholder="Enter full name"
-                value={formik.values.fullName}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                isInvalid={formik.touched.fullName && !!formik.errors.fullName}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.fullName}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Email */}
-        <Row className="mb-3">
-          <Col>
-            <Form.Group controlId="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                placeholder="Enter email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                isInvalid={formik.touched.email && !!formik.errors.email}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.email}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="phoneNumber">
-              <Form.Label>Phone Number</Form.Label>
-              <Form.Control
-                type="text"
-                name="phoneNumber"
-                placeholder="Enter phone number"
-                value={formik.values.phoneNumber}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                isInvalid={
-                  formik.touched.phoneNumber && !!formik.errors.phoneNumber
-                }
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.phoneNumber}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Password */}
-        <Row className="mb-3">
-          <Col>
-            <Form.Group controlId="password">
-              <Form.Label>Password</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Enter password"
-                  value={formik.values.password}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={
-                    formik.touched.password && !!formik.errors.password
-                  }
-                />
-                <InputGroup.Text onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <EyeSlashFill /> : <EyeFill />}
-                </InputGroup.Text>
-              </InputGroup>
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.password}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="dob">
-              <Form.Label>Date of Birth</Form.Label>
-              <Form.Control
-                type="date"
-                name="dob"
-                value={formik.values.dob}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                isInvalid={formik.touched.dob && !!formik.errors.dob}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.dob}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* Address */}
-        <Row className="mb-3">
-          <Col>
-            <Form.Group controlId="personalAuth">
-              <Form.Label>Personal Identification Code (ID Number)</Form.Label>
-              <Form.Control
-                type="text"
-                name="personalAuth"
-                placeholder="Enter personal identification code"
-                value={formik.values.personalAuth}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                isInvalid={
-                  formik.touched.personalAuth && !!formik.errors.personalAuth
-                }
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.personalAuth}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col>
-            <Form.Group controlId="address">
-              <Form.Label>Address</Form.Label>
-              <Form.Control
-                type="text"
-                name="address"
-                placeholder="Enter address"
-                value={formik.values.address}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                isInvalid={formik.touched.address && !!formik.errors.address}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.address}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row className="mb-3">
-          <Col>
-            <Form.Group controlId="hostel">
-              <Form.Label>Select Hostel</Form.Label>
-              <Form.Select
-                aria-label="Default select example"
-                name="hostelID"
-                value={formik.values.hostelID}
-                onChange={formik.handleChange}
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  setSearchTerm("");
+                  // setFilteredAccounts(accounts);
+                }}
               >
-                {hostel?.data?.map((h) => (
+                Clear Search
+              </Button>
+            </InputGroup>
+          </Form.Group>
+        </Col>
+        <Col md={3}>
+          <Form.Group controlId="filterHostel">
+            <Form.Label className="fw-bold">Filter by Hostel</Form.Label>
+            <InputGroup className="mb-3">
+              <Form.Select
+                value={selectedHostel}
+                onChange={handleFilterByHostel}
+                aria-label="Filter by hostel"
+              >
+                <option value="">All Hostels</option>
+                {hostelList?.map((h) => (
                   <option key={h.id} value={h.id}>
                     {h.name}
                   </option>
                 ))}
               </Form.Select>
-            </Form.Group>
-          </Col>
+            </InputGroup>
+          </Form.Group>
+        </Col>
+      </Row>
+      {/* Account List */}
+      { 1 > 0 ? (
+        <Table striped bordered hover className="">
+          <thead>
+            <tr className="row">
+              <th
+                className="col-md-1 text-center d-flex justify-content-center align-items-center"
+                onClick={() => handleSort("id")}
+                style={{ cursor: "pointer" }}
+              >
+                ID {sortField === "id" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
+              <th className="col-md-1 text-center d-flex justify-content-center align-items-center">
+                Avatar
+              </th>
+              <th
+                className="col-md-2 text-center d-flex justify-content-center align-items-center"
+                onClick={() => handleSort("fullName")}
+                style={{ cursor: "pointer" }}
+              >
+                Full Name{" "}
+                {sortField === "fullName" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
+              <th
+                className="col-md-2 text-center d-flex justify-content-center align-items-center"
+                onClick={() => handleSort("email")}
+                style={{ cursor: "pointer" }}
+              >
+                Email{" "}
+                {sortField === "email" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
 
-          <Col className={`${userLogin.role !== 2 ? "d-none" : ""}`}>
-            <Form.Group controlId="room">
-              <Form.Label>Select Room</Form.Label>
-              <ViewRoomByHostel
-                handleChangeRoom={handleChangeRoom}
-                handleChangeLoadingRoom={handleChangeLoadingRoom}
-                handleChangeErrorRoom={handleChangeErrorRoom}
-                rId={formik.values.roomID}
-                hId={formik.values.hostelID}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+              <th
+                className="col-md-1 text-center d-flex justify-content-center align-items-center"
+                onClick={() => handleSort("phoneNumber")}
+                style={{ cursor: "pointer" }}
+              >
+                Phone Number{" "}
+                {sortField === "phoneNumber" &&
+                  (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
+              <th
+                className="col-md text-center d-flex justify-content-center align-items-center"
+                onClick={() => handleSort("hostel")}
+                style={{ cursor: "pointer" }}
+              >
+                Hostel{" "}
+                {sortField === "hostel" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
 
-        {/* Submit Button */}
-        <Button type="submit" disabled={creatingAccount} className="w-100">
-          Create Account
-        </Button>
-      </Form>
+              <th
+                className={`${
+                  userLogin.role !== "manager" ? "d-none" : ""
+                } col-md text-center d-flex justify-content-center align-items-center`}
+              >
+                Room
+              </th>
+              <th className="col-md-1 text-center d-flex justify-content-center align-items-center">
+                Status
+              </th>
+              <th className="col-md-1 text-center d-flex justify-content-center align-items-center">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {accountList?.map((account) => (
+              <tr className="row" key={account.id}>
+                <td className="col-md-1 d-flex text-center justify-content-center align-items-center">
+                  {account.id}
+                </td>
+                <td className="col-md-1 d-flex text-center justify-content-center align-items-center">
+                  <Image
+                    src={account.avatar}
+                    alt="User Avatar"
+                    roundedCircle
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                    }}
+                  />
+                </td>
+                <td className="col-md-2 text-center d-flex justify-content-center align-items-center">
+                  {account.fullName}
+                </td>
+                <td className="col-md-2 text-center d-flex justify-content-center align-items-center">
+                  {account.email}
+                </td>
+                <td className="col-md-1 text-center d-flex justify-content-center align-items-center">
+                  {account.phoneNumber}
+                </td>
+                <td className="col-md d-flex text-center justify-content-center align-items-center">
+                  <Form.Select
+                    aria-label="Default select example"
+                    onChange={(e) =>
+                      handleChangeHostel(account, account.id, e.target.value)
+                    }
+                  >
+                    {hostelList?.map((h) => (
+                      <option
+                        key={h.id}
+                        value={h.id}
+                        selected={h?.manager?.id === account.id}
+                      >
+                        {h.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </td>
+                <td
+                  className={`${
+                    userLogin.role !== "manager" ? "d-none" : ""
+                  } col-md d-flex text-center justify-content-center align-items-center`}
+                >
+                  <ViewRoomByHostel
+                    hId={account.hostelID}
+                    handleChangeLoadingRoom={handleChangeLoadingRoom}
+                    // handleChangeErrorRoom={handleChangeErrorRoom}
+                    rId={account.roomID}
+                    accountId={account.id}
+                    account={account}
+                    handleChangeRoom={handleChangeRoom}
+                  />
+                </td>
+                <td
+                  className={`col-md-1 text-center d-flex justify-content-center align-items-center text-${
+                    account.status === 1 ? "success" : "danger"
+                  }`}
+                >
+                  {account.status === 1 ? "Active" : "Inactive"}{" "}
+                </td>
+                <td className="col-md-1 text-center d-flex justify-content-center align-items-center">
+                  <Button
+                    size="sm"
+                    variant={account.status === 1 ? "danger" : "success"}
+                    onClick={() =>
+                      handleUpdateStatus(account.id, account.status)
+                    }
+                  >
+                    {account.status === 1 ? "Ban" : "Active"}
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        <div className="text-center mt-5">
+          <p>No accounts have been created yet. Add a new account now!</p>
+          <Link to={"/manager/create_account"} className="btn btn-primary">
+            Add New Account
+          </Link>
+        </div>
+      )}
     </Container>
   );
 };
 
-export default memo(CreateAccount);
+export default memo(ViewListAccount);

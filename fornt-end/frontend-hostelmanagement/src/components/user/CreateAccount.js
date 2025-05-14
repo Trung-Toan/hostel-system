@@ -15,13 +15,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import ViewRoomByHostel from "./ViewRoomByHostel";
+import { useSessionStorage } from "../../ultil/useSessionStorage";
 
-const CreateAccount = ({ userLogin }) => {
+const CreateAccount = () => {
   const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const navigate = useNavigate();
   const [isLoadRoom, setIsLoadRoom] = useState();
   const [errorRoom, setErrorRoom] = useState(null);
+
+  const userLogin = useSessionStorage("user");
+
+  console.log(userLogin);
+  
+
+  
 
   const handleChangeLoadingRoom = useCallback((stateLoading) => {
     setIsLoadRoom(stateLoading);
@@ -68,7 +76,6 @@ const CreateAccount = ({ userLogin }) => {
       dob: "",
       address: "",
       personalAuth: "",
-      hostelID: hostel?.data[0]?.id || "",
       roomID: "",
     },
     validationSchema: Yup.object({
@@ -125,12 +132,6 @@ const CreateAccount = ({ userLogin }) => {
     formik.setFieldValue("roomID", newRoomId);
   };
 
-  useEffect(() => {
-    if (hostel?.data?.[0]?.id) {
-      formik.setFieldValue("hostelID", hostel.data[0].id);
-    }
-  }, [hostel]);
-
   if (loadingHostel || isLoadRoom) {
     return (
       <Container className="mt-5 text-center">
@@ -148,10 +149,6 @@ const CreateAccount = ({ userLogin }) => {
         </Alert>
       </Container>
     );
-  }
-
-  if (userLogin.role !== 1 && userLogin.role !== 2) {
-    return <p>You do not have permission to create an account.</p>;
   }
 
   return (

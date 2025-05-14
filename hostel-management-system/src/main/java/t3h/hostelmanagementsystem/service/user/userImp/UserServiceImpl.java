@@ -118,14 +118,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getAllUserExceptRole(String role) {
-        List<User> userList = userRepository.findAllUserExceptRole(role);
+        User.Role roleEnum = User.Role.valueOf(role.toLowerCase());
+        List<User> userList = userRepository.findAllUserExceptRole(roleEnum);
         return userList.stream().map(userMapper :: toDto).toList();
     }
 
     @Override
     public List<UserDTO> getAllUserByRole(String role) {
-        List<User> userList = userRepository.findAllUserByRole(role);
-        return userList.stream().map(userMapper :: toDto).toList();
+        User.Role roleEnum = User.Role.valueOf(role.toLowerCase());
+        List<User> userList = userRepository.findAllUserByRole(roleEnum);
+        return userList.stream().map(userMapper::toDto).toList();
     }
 
     @Override

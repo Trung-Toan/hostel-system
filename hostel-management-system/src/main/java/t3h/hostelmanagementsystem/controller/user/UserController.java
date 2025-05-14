@@ -26,7 +26,14 @@ public class UserController {
     }
 
     @GetMapping("/get-all-user/by-role/{role}")
-    public ApiResponse<List<UserDTO>> getAllUserByRole(@PathVariable String role) {
+    public ApiResponse<List<UserDTO>> getAllUserByRole(
+            @PathVariable String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false, defaultValue = "name") String sort,
+            @RequestParam(required = false, defaultValue = "ASC") String direction
+    ) {
         ApiResponse<List<UserDTO>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.getAllUserByRole(role));
         return apiResponse;

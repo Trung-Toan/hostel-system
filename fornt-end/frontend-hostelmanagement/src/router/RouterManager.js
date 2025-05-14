@@ -4,6 +4,8 @@ import HomeMangement from "../components/home/HomeMangement";
 import ViewPost from "../components/post/ViewPost";
 import CreatePost from "../components/post/CreatePost";
 import EditPost from "../components/post/EditPost";
+import ViewListAccount from "../components/user/ViewListAccount";
+import CreateAccount from "../components/user/CreateAccount";
 
 const RouterManager = () => {
   return (
@@ -12,6 +14,9 @@ const RouterManager = () => {
         <Route index element={<ViewPost />} />
         <Route path="add-new-post" element={<CreatePost/>} />
         <Route path="edit-post" element={<EditPost/>} />
+
+        <Route path='create_account' element = {<CreateAccount />} />
+        <Route path='view_account' element = {<ViewListAccount/>} />
       </Route>
     </Routes>
   );

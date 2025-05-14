@@ -15,10 +15,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsernameOrEmail(String username, String email);
 
     @Query("select u from User u where u.role != :role")
-    List<User> findAllUserExceptRole(String role);
+    List<User> findAllUserExceptRole(User.Role role);
 
     @Query("select u from User u where u.role = :role")
-    List<User> findAllUserByRole(String role);
+    List<User> findAllUserByRole(User.Role role);
 
     boolean existsByUsernameAndIdNot(String username, Long id);
 }

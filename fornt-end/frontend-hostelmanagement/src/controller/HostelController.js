@@ -9,6 +9,13 @@ export const useGetHostelList = (page, size, search, sort, direction) => {
   });
 };
 
+export const useGetAllHostel = () => {
+  return useDataByUrl({
+    url: HOSTEL_API.GETALL,
+    key: `hostel`,
+  });
+}
+
 export const useGetHostelById = (id) => {
   return useDataByUrl({
     url: HOSTEL_API.GETHOSTEL(id),
