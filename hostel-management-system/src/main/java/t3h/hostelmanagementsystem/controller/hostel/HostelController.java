@@ -69,4 +69,11 @@ public class HostelController {
         apiResponse.setResult(pagedModel);
         return apiResponse;
     }
+
+    @GetMapping("/get-hostel-by-user/{userId}")
+    public ApiResponse<HostelDTO> getHostelByUser(@PathVariable Long userId) {
+        ApiResponse<HostelDTO> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(hostelService.getHostelByUser(userId));
+        return apiResponse;
+    }
 }

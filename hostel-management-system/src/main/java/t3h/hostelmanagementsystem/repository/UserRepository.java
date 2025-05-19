@@ -1,5 +1,7 @@
 package t3h.hostelmanagementsystem.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import t3h.hostelmanagementsystem.entity.User;
@@ -21,4 +23,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllUserByRole(User.Role role);
 
     boolean existsByUsernameAndIdNot(String username, Long id);
+
+    @Query("SELECT u FROM User u WHERE u.role = :role")
+    Page<User> findAllByRole(User.Role role, Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.role = :role AND (LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%'))" +
+            " OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))" +
+            " OR LOWER(u.phoneNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR str(u.id) LIKE LOWER(CONCAT('%', :search, '%') ) )")
+    Page<User> findAllByRoleAndSearch(User.Role role, String search, Pageable pageable);
+
 }

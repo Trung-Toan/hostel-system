@@ -37,10 +37,6 @@ public class Hostel {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id")
-    private User manager;
-
     @OneToMany(mappedBy = "hostel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Room> rooms;
 

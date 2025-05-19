@@ -6,10 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import t3h.hostelmanagementsystem.dto.request.HostelDTO;
 import t3h.hostelmanagementsystem.entity.Hostel;
+import t3h.hostelmanagementsystem.entity.User;
 import t3h.hostelmanagementsystem.exception.AppException;
 import t3h.hostelmanagementsystem.exception.ErrorCode;
 import t3h.hostelmanagementsystem.mapper.HostelMapper;
+import t3h.hostelmanagementsystem.repository.CustomerRoomRepository;
 import t3h.hostelmanagementsystem.repository.HostelRepository;
+import t3h.hostelmanagementsystem.repository.UserRepository;
 
 import java.util.List;
 
@@ -17,10 +20,15 @@ import java.util.List;
 public class HostelServiceImpl implements HostelService {
     private final HostelRepository hostelRepository;
     private final HostelMapper hostelMapper;
+    private final UserRepository userRepository;
+    private final CustomerRoomRepository customerRoomRepository;
 
-    public HostelServiceImpl(HostelRepository hostelRepository, HostelMapper hostelMapper) {
+    public HostelServiceImpl(HostelRepository hostelRepository, HostelMapper hostelMapper,
+                             UserRepository userRepository, CustomerRoomRepository customerRoomRepository) {
         this.hostelRepository = hostelRepository;
         this.hostelMapper = hostelMapper;
+        this.userRepository = userRepository;
+        this.customerRoomRepository = customerRoomRepository;
     }
 
     private Hostel getHostel(Long id) {
@@ -69,5 +77,17 @@ public class HostelServiceImpl implements HostelService {
             return hostel.map(hostelMapper::toHostelDTO);
         }
         return hostelRepository.searchHostels(search, pageable).map(hostelMapper::toHostelDTO);
+    }
+
+    @Override
+    public HostelDTO getHostelByUser(Long userId) {
+        Hostel hostel;
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (user.getRole() == User.Role.owner) {
+            hostel = hostelRepository.findByOwnerId(userId);
+        } else {
+            hostel = customerRoomRepository.findHostelByCustomerId(userId);
+        }
+        return hostelMapper.toHostelDTO(hostel);
     }
 }

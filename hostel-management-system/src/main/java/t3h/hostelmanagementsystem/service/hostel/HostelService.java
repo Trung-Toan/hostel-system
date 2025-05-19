@@ -21,4 +21,6 @@ public interface HostelService {
 
     @Transactional
     Page<HostelDTO> getAllHostelPaged(Pageable pageable, String search);
+
+    HostelDTO getHostelByUser(Long userId);
 }

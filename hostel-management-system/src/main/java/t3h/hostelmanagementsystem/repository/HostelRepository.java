@@ -28,4 +28,8 @@ public interface HostelRepository extends JpaRepository<Hostel, Long> {
             "OR LOWER(h.address) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "OR LOWER(h.description) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<Hostel> searchHostels(String search, Pageable pageable);
+
+    @Query("SELECT h FROM Hostel h JOIN h.owner o WHERE o.id = :userId")
+    Hostel findByOwnerId(Long userId);
+
 }

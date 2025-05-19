@@ -41,3 +41,20 @@ export const updateAccount = async (accountId, account) => {
     }
 }
 
+export const banAccount = async (accountId) => {
+    try {
+        const response = await axios.put(ACCOUNT_API.BAN_ACCOUNT(accountId));
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: "Ban account failed!" };
+    }
+}
+
+export const unbanAccount = async (accountId) => {
+    try {
+        const response = await axios.put(ACCOUNT_API.UNBAN_ACCOUNT(accountId));
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: "Unban account failed!" };
+    }
+}

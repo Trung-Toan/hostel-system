@@ -8,6 +8,10 @@ public enum ErrorCode {
     FORGOT_PASSWORD_USERID_NOT_NULL(40003, "Forgot Password User Id Not Null"),
     PASSWORD_NOT_MATCH_REPASSWORD(40004, "Password not math RePassword"),
     USER_PASSWORD_WEAK(40005, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character"),
+    USER_BANED(40006, "User is banned"),
+    USER_BAN_ERROR(40006, "Ban user error"),
+    USER_UNBAN_ERROR(40007, "Unban user error"),
+    USER_UNBANED(40008, "User is unbaned"),
 
     // valid error
     INVALID_KEY(50000, "Invalid key"),
@@ -27,6 +31,10 @@ public enum ErrorCode {
     CUSTOMER_NULL(50206, "Customer cannot be null"),
     ROOM_NULL(50207, "Room cannot be null"),
     STATUS_NULL(50208, "Status cannot be null"),
+
+    // ManagerHostelDTO errors
+    MANAGER_ID_NULL(50209, "Manager ID cannot be null"),
+    HOSTEL_ID_NULL(50210, "Hostel ID cannot be null"),
 
     // HostelDTO errors
     HOSTEL_NOT_FOUND(50301, "Hotel not found"),

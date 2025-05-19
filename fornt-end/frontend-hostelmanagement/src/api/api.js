@@ -52,4 +52,6 @@ export const ACCOUNT_API = {
   CREATE: `${API_URL}/owner/create-account`,
   UPDATE: (accountId) => `${API_URL}/owner/update-user/${accountId}`,
   GET_ACCOUNT_BY_ID: (userId) => `${API_URL}/owner/get-user-by-id/${userId}`,
+  BAN_ACCOUNT: (accountId) => `${API_URL}/owner/ban-account/${accountId}`,
+  UNBAN_ACCOUNT: (accountId) => `${API_URL}/owner/unban-account/${accountId}`,
 }

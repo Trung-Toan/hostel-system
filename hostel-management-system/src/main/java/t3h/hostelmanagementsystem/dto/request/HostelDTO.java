@@ -31,8 +31,6 @@ public class HostelDTO {
     @NotNull(message = "HOSTEL_OWNER_NULL")
     private UserDTO owner;
 
-    private UserDTO manager; // Manager có thể null
-
     private String image;
 
     @NotNull(message = "HOSTEL_STATUS_NULL")

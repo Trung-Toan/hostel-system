@@ -1,5 +1,7 @@
 package t3h.hostelmanagementsystem.service.user.userImp;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,7 @@ import t3h.hostelmanagementsystem.entity.User;
 import t3h.hostelmanagementsystem.exception.AppException;
 import t3h.hostelmanagementsystem.exception.ErrorCode;
 import t3h.hostelmanagementsystem.mapper.UserMapper;
-import t3h.hostelmanagementsystem.repository.CustomerRoomRepository;
-import t3h.hostelmanagementsystem.repository.HostelRepository;
-import t3h.hostelmanagementsystem.repository.RoomRepository;
-import t3h.hostelmanagementsystem.repository.UserRepository;
+import t3h.hostelmanagementsystem.repository.*;
 import t3h.hostelmanagementsystem.service.user.UserService;
 
 
@@ -32,16 +31,23 @@ public class UserServiceImpl implements UserService {
     private final RoomRepository roomRepository;
     private final CustomerRoomRepository roomCustomerRoomRepository;
     private final CustomerRoomRepository customerRoomRepository;
+    private final ManagerHostelRepository managerHostelRepository;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,
-                           HostelRepository hostelRepository, RoomRepository roomRepository,
-                           CustomerRoomRepository roomCustomerRoomRepository, CustomerRoomRepository customerRoomRepository) {
+    public UserServiceImpl(UserRepository userRepository,
+                           UserMapper userMapper,
+                           HostelRepository hostelRepository,
+                           RoomRepository roomRepository,
+                           CustomerRoomRepository roomCustomerRoomRepository,
+                           CustomerRoomRepository customerRoomRepository,
+                           ManagerHostelRepository managerHostelRepository)
+    {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.hostelRepository = hostelRepository;
         this.roomRepository = roomRepository;
         this.roomCustomerRoomRepository = roomCustomerRoomRepository;
         this.customerRoomRepository = customerRoomRepository;
+        this.managerHostelRepository = managerHostelRepository;
     }
 
     @Override
@@ -74,7 +80,6 @@ public class UserServiceImpl implements UserService {
 
         if (userDTO.getRole().equalsIgnoreCase("manager")) {
             Hostel hostel = hostelRepository.findById(userDTO.getHostelId()).orElseThrow(() -> new AppException(ErrorCode.HOSTEL_NOT_FOUND));
-            hostel.setManager(savedUser);
             hostelRepository.save(hostel);
         } else {
             Long customerId = savedUser.getId();
@@ -147,6 +152,49 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserById(Long userId) {
         User user = findById(userId);
         return userMapper.toDto(user);
+    }
+
+    @Override
+    public Page<UserDTO> getAllUserByRoleByPage(String role, String search, Pageable pageable) {
+        User.Role roleEnum = User.Role.valueOf(role.toLowerCase());
+        if (search == null || search.trim().isEmpty()) {
+            return userRepository.findAllByRole(roleEnum, pageable).map(userMapper::toDto);
+        }
+        search = search.trim().replaceAll("\\s+", " ");
+        return userRepository.findAllByRoleAndSearch(roleEnum, search, pageable).map(userMapper::toDto);
+    }
+
+    @Override
+    @Transactional
+    public UserDTO banAccount(Long userId) {
+        User user = findById(userId);
+        if (user.getStatus() == 1) {
+            user.setStatus(0);
+            userRepository.save(user);
+
+            Long managerId = user.getId();
+            managerHostelRepository.updateEndDateByUserId(managerId);
+            return userMapper.toDto(user);
+        } else if (user.getStatus() == 0) {
+            throw new AppException(ErrorCode.USER_BANED);
+        } else {
+            throw new AppException(ErrorCode.USER_BAN_ERROR);
+        }
+    }
+
+    @Override
+    @Transactional
+    public UserDTO unBanAccount(Long userId) {
+        User user = findById(userId);
+        if (user.getStatus() == 0) {
+            user.setStatus(1);
+            userRepository.save(user);
+            return userMapper.toDto(user);
+        } else if (user.getStatus() == 1) {
+            throw new AppException(ErrorCode.USER_UNBANED);
+        } else {
+            throw new AppException(ErrorCode.USER_UNBAN_ERROR);
+        }
     }
 
     private User findById (Long idUser) {

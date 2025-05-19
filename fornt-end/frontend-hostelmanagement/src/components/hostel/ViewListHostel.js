@@ -73,8 +73,6 @@ const ViewListHostel = () => {
       });
     },
     onError: (error) => {
-      console.log(error);
-      
       Swal.fire({
         icon: "error",
         title: "Error",
