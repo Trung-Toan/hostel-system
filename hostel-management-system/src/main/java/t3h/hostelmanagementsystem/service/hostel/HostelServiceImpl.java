@@ -90,4 +90,13 @@ public class HostelServiceImpl implements HostelService {
         }
         return hostelMapper.toHostelDTO(hostel);
     }
+
+    @Override
+    public List<HostelDTO> getAllHostelByStatus(int status) {
+        List<Hostel> hostels = hostelRepository.findAllByStatusAndAvailableRoom(status);
+        if (hostels.isEmpty()) {
+            throw new AppException(ErrorCode.HOSTEL_NOT_FOUND);
+        }
+        return hostels.stream().map(hostelMapper::toHostelDTO).toList();
+    }
 }

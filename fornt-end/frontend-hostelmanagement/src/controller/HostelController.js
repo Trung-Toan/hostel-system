@@ -16,6 +16,13 @@ export const useGetAllHostel = () => {
   });
 }
 
+export const useGetAllHostelByStatus = (status) => {
+  return useDataByUrl({
+    url: HOSTEL_API.GETALLBYSTATUS(status),
+    key: `hostel_status_${status}`,
+  });
+}
+
 export const useGetHostelById = (id) => {
   return useDataByUrl({
     url: HOSTEL_API.GETHOSTEL(id),

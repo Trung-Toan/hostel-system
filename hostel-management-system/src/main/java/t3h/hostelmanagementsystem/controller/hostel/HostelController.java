@@ -76,4 +76,11 @@ public class HostelController {
         apiResponse.setResult(hostelService.getHostelByUser(userId));
         return apiResponse;
     }
+
+    @GetMapping("/get-all-hostel-by-status/{status}")
+    public ApiResponse<List<HostelDTO>> getAllHostelByStatus(@PathVariable int status) {
+        ApiResponse<List<HostelDTO>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(hostelService.getAllHostelByStatus(status));
+        return apiResponse;
+    }
 }

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback, useState } from "react";
 import {
   Form,
   Button,
@@ -7,66 +7,65 @@ import {
   Row,
   Col,
   Spinner,
-  Alert,
 } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import ViewRoomByHostel from "./ViewRoomByHostel";
 import { useSessionStorage } from "../../ultil/useSessionStorage";
+import { useGetAllHostelByStatus } from "../../controller/HostelController";
+import Swal from "sweetalert2";
+import { createAccount } from "../../controller/UserController";
 
 const CreateAccount = () => {
   const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const navigate = useNavigate();
-  const [isLoadRoom, setIsLoadRoom] = useState();
-  const [errorRoom, setErrorRoom] = useState(null);
 
   const userLogin = useSessionStorage("user");
 
-  console.log(userLogin);
-  
-
-  
-
-  const handleChangeLoadingRoom = useCallback((stateLoading) => {
-    setIsLoadRoom(stateLoading);
-  }, []);
-
-  const handleChangeErrorRoom = useCallback((stateError) => {
-    setErrorRoom(stateError);
-  }, []);
-
   const {
-    data: hostel,
+    data,
     isLoading: loadingHostel,
     error: errorHostel,
-  } = useQuery({
-    queryFn: () => [],
-    queryKey: ["hostel"],
-    staleTime: 10000,
-    cacheTime: 1000 * 60,
-  });
+  } = useGetAllHostelByStatus(1);
+
+  const resetUserByRoleQueries = () => {
+    // Làm mới tất cả các query bắt đầu bằng 'user_by_role'
+    queryClient.invalidateQueries({ queryKey: ["user_by_role"] });
+  };
+
+  const hostel = data?.data?.result || [];
 
   // Mutation to send data to the server
-  const { mutate: createAccount, isLoading: creatingAccount } = useMutation({
-    mutationFn: (payload) => [],
+  const { mutate, isLoading: creatingAccount } = useMutation({
+    mutationFn: (payload) => createAccount(payload),
     onSuccess: () => {
-      alert("Account created successfully!");
-      queryClient.invalidateQueries(["accounts"]);
-      setTimeout(() => {
-        navigate("/admin/view_account");
-      }, 1000);
+      resetUserByRoleQueries();
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Create new account successfully!",
+        timer: 3000,
+        showConfirmButton: true,
+      }).then(() => navigate(-1));
     },
-    onError: () => {
-      alert("An error occurred while creating the account!");
+    onError: (error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.message || "An error occurred.",
+        timer: 3000,
+        showConfirmButton: true,
+      });
     },
   });
 
   // Formik and Yup for validation
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       fullName: "",
       username: "",
@@ -77,12 +76,11 @@ const CreateAccount = () => {
       address: "",
       personalAuth: "",
       roomID: "",
+      hostelID: hostel?.[0]?.id || "",
     },
     validationSchema: Yup.object({
       fullName: Yup.string().trim().required("Full name cannot be empty."),
-      username: Yup.string()
-        .trim()
-        .required("Username cannot be empty."),
+      username: Yup.string().trim().required("Username cannot be empty."),
       email: Yup.string()
         .email("Invalid email.")
         .required("Email cannot be empty."),
@@ -114,25 +112,37 @@ const CreateAccount = () => {
       personalAuth: Yup.string()
         .trim()
         .required("Personal identification code cannot be empty.")
-        .matches(/^[0-9a-zA-Z]+$/, "Personal ID must contain only letters and numbers."),
+        .matches(
+          /^[0-9a-zA-Z]+$/,
+          "Personal ID must contain only letters and numbers."
+        )
+        .min(12, "Personal ID must be 12 characters.")
+        .max(12, "Personal ID must be 12 characters."),
+      roomID: Yup.string().when(userLogin.role, {
+        is: "manager",
+        then: (schema) => schema.required("Room cannot be empty."),
+        otherwise: (schema) => schema.optional(),
+      }),
     }),
     onSubmit: (values) => {
       const payload = {
         ...values,
-        role: userLogin.role === 1 ? 2 : 0,
+        roomId: values.roomID,
+        hostelId: values.hostelID,
+        role: userLogin.role === "owner" ? "manager" : "customer",
         status: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       };
-      createAccount(payload);
+      delete payload.roomID;
+      delete payload.hostelID;
+      mutate(payload);
     },
   });
 
-  const handleChangeRoom = (acc, accountId, newRoomId) => {
+  const handleChangeRoom = useCallback((newRoomId) => {
     formik.setFieldValue("roomID", newRoomId);
-  };
+  }, []);
 
-  if (loadingHostel || isLoadRoom) {
+  if (loadingHostel) {
     return (
       <Container className="mt-5 text-center">
         <Spinner animation="border" />
@@ -141,27 +151,29 @@ const CreateAccount = () => {
     );
   }
 
-  if (errorHostel || errorRoom) {
-    return (
-      <Container className="mt-5">
-        <Alert variant="danger">
-          The system is experiencing an issue. Please try again later!
-        </Alert>
-      </Container>
-    );
+  if (errorHostel) {
+    return Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: errorHostel || "An error occurred.",
+      timer: 3000,
+      showConfirmButton: true,
+    });
   }
 
   return (
     <Container className="mt-4">
-      <h2 className="text-center mb-4">
-        Create Account {userLogin.role === 1 ? "Manager" : "Customer"}
+      <h2 className="text-center fw-bold mb-5">
+        Create Account {userLogin.role === "owner" ? "Manager" : "Customer"}
       </h2>
       <Form onSubmit={formik.handleSubmit}>
         {/* Full Name */}
-        <Row className="mb-3">
+        <Row className="mb-4">
           <Col>
             <Form.Group controlId="username">
-              <Form.Label>Username</Form.Label>
+              <Form.Label className="fw-bold">
+                Username <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="username"
@@ -178,7 +190,9 @@ const CreateAccount = () => {
           </Col>
           <Col>
             <Form.Group controlId="fullName">
-              <Form.Label>Full Name</Form.Label>
+              <Form.Label className="fw-bold">
+                Full Name <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="fullName"
@@ -196,10 +210,12 @@ const CreateAccount = () => {
         </Row>
 
         {/* Email */}
-        <Row className="mb-3">
+        <Row className="mb-4">
           <Col>
             <Form.Group controlId="email">
-              <Form.Label>Email</Form.Label>
+              <Form.Label className="fw-bold">
+                Email <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 type="email"
                 name="email"
@@ -216,7 +232,9 @@ const CreateAccount = () => {
           </Col>
           <Col>
             <Form.Group controlId="phoneNumber">
-              <Form.Label>Phone Number</Form.Label>
+              <Form.Label className="fw-bold">
+                Phone Number <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="phoneNumber"
@@ -236,10 +254,12 @@ const CreateAccount = () => {
         </Row>
 
         {/* Password */}
-        <Row className="mb-3">
+        <Row className="mb-4">
           <Col>
             <Form.Group controlId="password">
-              <Form.Label>Password</Form.Label>
+              <Form.Label className="fw-bold">
+                Password <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <InputGroup>
                 <Form.Control
                   type={showPassword ? "text" : "password"}
@@ -263,7 +283,9 @@ const CreateAccount = () => {
           </Col>
           <Col>
             <Form.Group controlId="dob">
-              <Form.Label>Date of Birth</Form.Label>
+              <Form.Label className="fw-bold">
+                Date of Birth <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 type="date"
                 name="dob"
@@ -280,10 +302,13 @@ const CreateAccount = () => {
         </Row>
 
         {/* Address */}
-        <Row className="mb-3">
+        <Row className="mb-4">
           <Col>
             <Form.Group controlId="personalAuth">
-              <Form.Label>Personal Identification Code (ID Number)</Form.Label>
+              <Form.Label className="fw-bold">
+                Personal Identification Code (ID Number)
+                <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="personalAuth"
@@ -302,7 +327,9 @@ const CreateAccount = () => {
           </Col>
           <Col>
             <Form.Group controlId="address">
-              <Form.Label>Address</Form.Label>
+              <Form.Label className="fw-bold">
+                Address <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="address"
@@ -318,17 +345,22 @@ const CreateAccount = () => {
             </Form.Group>
           </Col>
         </Row>
-        <Row className="mb-3">
+
+        {/* Hostel and Room Selection */}
+        <Row className="mb-4">
+          {/* select hostel */}
           <Col>
             <Form.Group controlId="hostel">
-              <Form.Label>Select Hostel</Form.Label>
+              <Form.Label className="fw-bold">
+                Select Hostel <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 aria-label="Default select example"
                 name="hostelID"
                 value={formik.values.hostelID}
                 onChange={formik.handleChange}
               >
-                {hostel?.data?.map((h) => (
+                {hostel?.map((h) => (
                   <option key={h.id} value={h.id}>
                     {h.name}
                   </option>
@@ -337,13 +369,17 @@ const CreateAccount = () => {
             </Form.Group>
           </Col>
 
-          <Col className={`${userLogin.role !== 2 ? "d-none" : ""}`}>
+          {/* select room by hostel */}
+          <Col className={`${userLogin.role !== "manager" ? "d-none" : ""}`}>
             <Form.Group controlId="room">
-              <Form.Label>Select Room</Form.Label>
+              <Form.Label className="fw-bold">
+                Select Room <span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <ViewRoomByHostel
                 handleChangeRoom={handleChangeRoom}
-                handleChangeLoadingRoom={handleChangeLoadingRoom}
-                handleChangeErrorRoom={handleChangeErrorRoom}
+                onBlur={formik.handleBlur}
+                isInvalid={formik.touched.roomID && !!formik.errors.roomID}
+                mess={formik.errors.roomID}
                 rId={formik.values.roomID}
                 hId={formik.values.hostelID}
               />

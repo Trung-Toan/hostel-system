@@ -32,4 +32,8 @@ public interface HostelRepository extends JpaRepository<Hostel, Long> {
     @Query("SELECT h FROM Hostel h JOIN h.owner o WHERE o.id = :userId")
     Hostel findByOwnerId(Long userId);
 
+    List<Hostel> findAllByStatus(int status);
+
+    @Query("SELECT h FROM Hostel h JOIN h.rooms r WHERE h.status = :status AND r.status = 1")
+    List<Hostel> findAllByStatusAndAvailableRoom(int status);
 }

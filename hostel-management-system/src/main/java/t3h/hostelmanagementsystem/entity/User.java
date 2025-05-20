@@ -44,6 +44,9 @@ public class User {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "personal_auth")
+    private String personalAuth;
+
     @Column(name = "avatar")
     private String avatar;
 

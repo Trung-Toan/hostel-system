@@ -12,6 +12,11 @@ public enum ErrorCode {
     USER_BAN_ERROR(40006, "Ban user error"),
     USER_UNBAN_ERROR(40007, "Unban user error"),
     USER_UNBANED(40008, "User is unbaned"),
+    USER_PERSONAL_AUTH_BLANK(40009, "Personal auth cannot be blank"),
+    USER_PERSONAL_AUTH_SIZE(40010, "Personal auth must be 12 characters"),
+    USER_PERSONAL_AUTH_INVALID(40011, "Personal auth must be alphanumeric"),
+    USER_USERNAME_EXISTED(40012, "Username already existed"),
+    USER_EMAIL_EXISTED(40013, "Email already existed"),
 
     // valid error
     INVALID_KEY(50000, "Invalid key"),

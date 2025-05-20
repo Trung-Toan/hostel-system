@@ -53,6 +53,12 @@ public class UserDTO {
     @Size(max = 500, message = "USER_ADDRESS_SIZE")
     private String address;
 
+    @NotBlank(message = "USER_PERSONAL_AUTH_BLANK")
+    @Size(min = 12, max = 12, message = "USER_PERSONAL_AUTH_SIZE")
+    @Pattern(regexp = "^[0-9a-zA-Z]+$", message = "USER_PERSONAL_AUTH_INVALID")
+    private String personalAuth;
+
+
     @Size(max = 255, message = "USER_AVATAR_SIZE")
     private String avatar;
 

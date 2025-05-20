@@ -32,7 +32,7 @@ public class ManagerHostel {
     private LocalDate endDate;
 
     @Embeddable
-    class ManagerHostelId implements java.io.Serializable {
+    public static class ManagerHostelId implements java.io.Serializable {
         private Long managerId;
         private Long hostelId;
 

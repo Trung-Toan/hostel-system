@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import t3h.hostelmanagementsystem.dto.request.ForgotPasswordRequest;
 import t3h.hostelmanagementsystem.dto.request.LoginRequestDTO;
 import t3h.hostelmanagementsystem.dto.request.UserDTO;
-import t3h.hostelmanagementsystem.entity.CustomerRoom;
-import t3h.hostelmanagementsystem.entity.Hostel;
-import t3h.hostelmanagementsystem.entity.User;
+import t3h.hostelmanagementsystem.entity.*;
 import t3h.hostelmanagementsystem.exception.AppException;
 import t3h.hostelmanagementsystem.exception.ErrorCode;
 import t3h.hostelmanagementsystem.mapper.UserMapper;
@@ -67,7 +65,12 @@ public class UserServiceImpl implements UserService {
         // Kiểm tra xem username đã tồn tại chưa
         Optional<User> existingUserByUsername = userRepository.findByUsername(userDTO.getUsername());
         if (existingUserByUsername.isPresent()) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+            throw new AppException(ErrorCode.USER_USERNAME_EXISTED);
+        }
+
+        Optional<User> exitingUserByEmail = userRepository.findByEmail(userDTO.getEmail());
+        if (exitingUserByEmail.isPresent()) {
+            throw new AppException(ErrorCode.USER_EMAIL_EXISTED);
         }
 
         // Chuyển từ UserDTO sang User entity
@@ -79,17 +82,38 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         if (userDTO.getRole().equalsIgnoreCase("manager")) {
+            Long hostelId = userDTO.getHostelId();
+            Long managerId = savedUser.getId();
+
+            ManagerHostel.ManagerHostelId managerHostelId = new ManagerHostel.ManagerHostelId(managerId, hostelId);
+
             Hostel hostel = hostelRepository.findById(userDTO.getHostelId()).orElseThrow(() -> new AppException(ErrorCode.HOSTEL_NOT_FOUND));
-            hostelRepository.save(hostel);
+
+            ManagerHostel managerHostel = new ManagerHostel();
+            managerHostel.setId(managerHostelId);
+            managerHostel.setStartDate(LocalDate.now());
+            managerHostel.setManager(savedUser);
+            managerHostel.setHostel(hostel);
+            ManagerHostel save = managerHostelRepository.save(managerHostel);
+            if (save == null) {
+                System.out.println("error");
+            } else {
+                System.out.println("success");
+            }
         } else {
             Long customerId = savedUser.getId();
             Long roomId = userDTO.getRoomId();
+
+            Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+
             LocalDate startDate = LocalDate.now();
             CustomerRoom.CustomerRoomId customerRoomId = new CustomerRoom.CustomerRoomId(customerId, roomId);
 
             CustomerRoom customerRoom = new CustomerRoom();
             customerRoom.setId(customerRoomId);
             customerRoom.setStartDate(startDate);
+            customerRoom.setCustomer(savedUser);
+            customerRoom.setRoom(room);
 
             customerRoomRepository.save(customerRoom);
         }

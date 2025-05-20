@@ -23,4 +23,6 @@ public interface HostelService {
     Page<HostelDTO> getAllHostelPaged(Pageable pageable, String search);
 
     HostelDTO getHostelByUser(Long userId);
+
+    List<HostelDTO> getAllHostelByStatus(int status);
 }
